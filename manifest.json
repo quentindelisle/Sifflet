@@ -1,0 +1,31 @@
+{
+  "id": "./index.html",
+  "name": "Sifflet",
+  "short_name": "Sifflet",
+  "description": "Sifflet — départs au coup de sifflet (manuels ou bande son), temps de course réglable, photo finish automatique, notation de l'écart à la cible et export CSV.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#0b1836",
+  "theme_color": "#0b1836",
+  "lang": "fr",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

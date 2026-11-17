@@ -1,0 +1,2885 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1836" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Sifflet" />
+  <title>Sifflet</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  <style>
+    :root {
+      --bg1: #071225;
+      --bg2: #0b1836;
+      --card: rgba(10,22,48,.90);
+      --card-border: rgba(255,255,255,.14);
+      --text: #f8fbff;
+      --muted: #c5d6f4;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: radial-gradient(circle at top, #12376f 0%, var(--bg2) 35%, var(--bg1) 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    body { min-height: 100vh; }
+    .app {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      padding: 14px 14px 72px;
+      position: relative;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+    .brand img.logo {
+      width: clamp(92px, 14vw, 126px);
+      height: clamp(92px, 14vw, 126px);
+      object-fit: cover;
+      object-position: center;
+      border-radius: 24px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.28);
+      display: block;
+      background: transparent;
+    }
+    .brand-text h1 { margin: 0; font-size: clamp(1.55rem, 3.2vw, 2.5rem); line-height: 1; }
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 960px) {
+      .grid { grid-template-columns: 390px 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 26px;
+      padding: 16px;
+      box-shadow: 0 14px 30px rgba(0,0,0,.24);
+      backdrop-filter: blur(8px);
+    }
+    .card h2 { margin: 0 0 14px; font-size: 1.08rem; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .row + .row { margin-top: 12px; }
+    .field { display: grid; gap: 6px; width: 100%; }
+    label { font-weight: 800; }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      background: rgba(3,10,22,.88);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c5d6f4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 20px;
+      padding-right: 40px;
+    }
+    select option { color: #0b1836; }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .checkbox-row input[type="checkbox"] { width: 20px; height: 20px; flex: none; }
+    .stepper-row {
+      display: grid;
+      grid-template-columns: 72px 1fr 72px;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+    }
+    .stepper-btn {
+      font-size: 2rem;
+      line-height: 1;
+      padding: 0;
+      min-height: 58px;
+      border-radius: 18px;
+    }
+    .seconds-display {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      background: rgba(3,10,22,.88);
+      border: 1px solid var(--card-border);
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: .03em;
+    }
+    button, a.dl {
+      appearance: none;
+      border: none;
+      border-radius: 18px;
+      padding: 13px 15px;
+      min-height: 50px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 8px;
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    }
+    button:hover:not(:disabled), a.dl:hover { transform: translateY(-1px); filter: brightness(1.06); }
+    button:active:not(:disabled), a.dl:active { transform: translateY(0); filter: brightness(.96); }
+    button.full, a.dl.full { width: 100%; }
+    button.primary { background: linear-gradient(135deg, #1d63ff, #5ba1ff); box-shadow: 0 10px 20px rgba(46,121,255,.33); }
+    button.secondary { background: linear-gradient(135deg, #31415f, #5d6f90); }
+    button.success { background: linear-gradient(135deg, #139245, #22c55e); box-shadow: 0 10px 20px rgba(34,197,94,.23); }
+    button.warn { background: linear-gradient(135deg, #d29812, #f2c94c); color: #13233f; box-shadow: 0 10px 20px rgba(242,201,76,.25); }
+    button.danger { background: linear-gradient(135deg, #b91c1c, #ef4444); box-shadow: 0 10px 20px rgba(239,68,68,.22); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    button.mode-btn.active, button.unit-btn.active { background: linear-gradient(135deg, #1d63ff, #5ba1ff); box-shadow: 0 10px 20px rgba(46,121,255,.33); }
+    .info-btn {
+      width: 26px;
+      height: 26px;
+      min-height: 26px;
+      padding: 0;
+      border-radius: 50%;
+      background: rgba(91,161,255,.16);
+      color: #5ba1ff;
+      border: 1.5px solid rgba(91,161,255,.6);
+      font-weight: 900;
+      font-style: italic;
+      font-size: .82rem;
+      line-height: 1;
+      flex: none;
+      box-shadow: none;
+    }
+    .info-btn:hover { background: rgba(91,161,255,.3); }
+    .admin-tabs {
+      display: flex;
+      gap: 6px;
+      margin-top: 18px;
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+    }
+    .admin-tab-btn {
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+      border-radius: 14px 14px 0 0;
+      padding: 10px 14px;
+      min-height: auto;
+      border-bottom: 3px solid transparent;
+    }
+    .admin-tab-btn:hover:not(:disabled) { transform: none; filter: none; color: #fff; }
+    .admin-tab-btn.active {
+      color: #ffffff;
+      background: rgba(91,161,255,.14);
+      border-bottom: 3px solid #5ba1ff;
+    }
+    .admin-tab-panel { padding-top: 16px; }
+    .qr-wrap {
+      margin-top: 14px;
+      text-align: center;
+    }
+    .qr-box {
+      display: inline-block;
+      background: #ffffff;
+      padding: 14px;
+      border-radius: 18px;
+    }
+    .card { transition: box-shadow .15s ease; }
+    .card:hover { box-shadow: 0 18px 36px rgba(0,0,0,.3); }
+    .timer {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--card-border);
+      text-align: center;
+    }
+    .time { font-size: clamp(2.4rem, 10vw, 4.6rem); line-height: 1; font-weight: 900; letter-spacing: .03em; }
+    .status { margin-top: 10px; color: var(--muted); font-weight: 700; }
+    .video-wrap {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #020817;
+      border: 1px solid var(--card-border);
+      aspect-ratio: 16/10;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+    .gallery { margin-top: 16px; }
+    .latest-box { margin-top: 10px; }
+    .latest-box img {
+      width: 100%;
+      border-radius: 18px;
+      display: block;
+      border: 1px solid var(--card-border);
+      background: #000;
+    }
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .thumb {
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      padding: 0;
+      text-align: left;
+      color: inherit;
+    }
+    .thumb img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display: block;
+      background: #000;
+    }
+    .thumb .meta { padding: 8px 10px; font-size: .84rem; color: var(--muted); line-height: 1.3; }
+    .note { color: var(--muted); font-size: .94rem; line-height: 1.4; }
+    .ecart-panel { margin-top: 16px; }
+    .ecart-buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      margin-top: 12px;
+    }
+    .ecart-btn {
+      min-height: 46px;
+      padding: 4px 2px;
+      border-radius: 13px;
+      font-weight: 900;
+      font-size: .92rem;
+      color: white;
+      border: 2px solid transparent;
+      text-shadow: 0 1px 3px rgba(0,0,0,.35);
+    }
+    .ecart-btn:hover:not(:disabled) { transform: translateY(-1px) scale(1.03); }
+    .ecart-btn.selected {
+      border-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.32);
+      transform: scale(1.07);
+    }
+    .ecart-btn.zero { grid-column: span 1; font-size: .8rem; }
+    .ecart-tag { font-weight: 800; }
+    .ecart-tag.neg { color: #f87171; }
+    .ecart-tag.pos { color: #4ade80; }
+    .ecart-tag.target { color: #60a5fa; }
+    .ecart-tag.none { color: var(--muted); font-weight: 700; }
+    .target-badge {
+      margin-top: 10px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(96,165,250,.26), rgba(96,165,250,.08));
+      border: 1px solid rgba(96,165,250,.5);
+      color: #eaf3ff;
+      font-size: 1.2rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: .01em;
+    }
+    .hidden { display: none !important; }
+    a.dl {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: white;
+      margin-top: 12px;
+      border-radius: 16px;
+      min-height: 48px;
+      padding: 12px 14px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #15803d, #22c55e);
+    }
+    .signature {
+      position: fixed;
+      right: 12px;
+      bottom: 10px;
+      font-size: 1rem;
+      font-style: italic;
+      color: rgba(255,255,255,.92);
+      text-shadow: 0 2px 10px rgba(0,0,0,.35);
+      z-index: 20;
+      pointer-events: none;
+    }
+    .version-tag {
+      position: fixed;
+      left: 12px;
+      bottom: 10px;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      color: rgba(255,255,255,.55);
+      z-index: 20;
+      pointer-events: none;
+    }
+    .admin-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,16,.72);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 14px;
+      z-index: 60;
+      overflow-y: auto;
+    }
+    .admin-modal {
+      width: min(100%, 720px);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+    .admin-modal-header {
+      position: sticky;
+      top: -16px;
+      margin: -16px -16px 12px;
+      padding: 16px 16px 12px;
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--card-border);
+      z-index: 5;
+    }
+    .photo-modal {
+      width: min(100%, 980px);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+    .photo-analysis-grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 20px;
+      margin-top: 14px;
+      align-items: stretch;
+    }
+    .photo-analysis-left, .photo-analysis-right {
+      display: flex;
+      flex-direction: column;
+    }
+    .photo-analysis-left img {
+      width: 100%;
+      border-radius: 18px;
+      display: block;
+      border: 1px solid var(--card-border);
+      background: #000;
+    }
+    .photo-analysis-left a.dl { margin-top: auto; }
+    @media (max-width: 760px) {
+      .photo-analysis-grid { grid-template-columns: 1fr; }
+    }
+    .roster-manage-list { margin-top: 8px; }
+    .roster-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--card-border);
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .roster-row span { flex: 1; min-width: 140px; }
+    .roster-target-input { width: 110px; padding: 8px 10px; font-size: .9rem; }
+    .roster-remove { min-height: 36px; padding: 6px 14px; font-size: .85rem; }
+    .results-table-wrap { overflow-x: auto; margin-top: 8px; }
+    table.results-table { width: 100%; border-collapse: collapse; font-size: .92rem; min-width: 480px; }
+    table.results-table th, table.results-table td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--card-border); }
+    table.results-table th { color: var(--muted); font-weight: 800; font-size: .82rem; text-transform: uppercase; letter-spacing: .03em; }
+    table.results-table td.num { font-weight: 800; }
+    @media (max-width: 640px) {
+      .header { align-items: flex-start; flex-direction: column; }
+      .top-actions { width: 100%; justify-content: stretch; }
+      .top-actions button { flex: 1; }
+    }
+
+    /* ---- Sifflet : gestion des départs ---- */
+    .brand-text .subtitle { margin-top: 6px; color: var(--muted); font-weight: 700; font-size: .95rem; }
+    #manualPanel, #trackPanel { display: grid; gap: 12px; margin: 12px 0; }
+    #manualPanel > .row + .row, #manualPanel > div + .row { margin-top: 0; }
+    #trackPanel .cue-panel { margin-top: 0; }
+    .depart-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; border-radius: 16px; background: rgba(255,255,255,.06); border: 1px solid var(--card-border); margin-bottom: 14px; }
+    .depart-tab { min-height: 46px; background: transparent; box-shadow: none; color: var(--muted); font-size: .95rem; }
+    .depart-tab.active { background: linear-gradient(135deg, #1d63ff, #5ba1ff); color: #fff; box-shadow: 0 8px 16px rgba(46,121,255,.3); }
+    .cue-panel { margin-top: 14px; border-radius: 18px; padding: 14px; text-align: center; background: rgba(255,255,255,.05); border: 1px solid var(--card-border); transition: background .2s ease, border-color .2s ease; }
+    .cue-text { font-size: clamp(1.6rem, 6vw, 2.6rem); font-weight: 900; line-height: 1.1; min-height: 1.2em; }
+    .cue-sub { margin-top: 6px; color: var(--muted); font-weight: 700; }
+    .cue-panel.marques { background: rgba(242,201,76,.16); border-color: rgba(242,201,76,.6); }
+    .cue-panel.prets { background: rgba(249,115,22,.2); border-color: rgba(249,115,22,.7); }
+    .cue-panel.go { background: rgba(34,197,94,.25); border-color: rgba(74,222,128,.85); }
+    .track-progress { margin-top: 10px; height: 8px; border-radius: 99px; background: rgba(255,255,255,.1); overflow: hidden; }
+    .track-progress > div { height: 100%; width: 0; background: linear-gradient(90deg, #22c55e, #5ba1ff); transition: width .2s linear; }
+    .listen-meter { margin-top: 10px; height: 10px; border-radius: 99px; background: rgba(255,255,255,.1); overflow: hidden; position: relative; }
+    .listen-meter > div { height: 100%; width: 0; background: linear-gradient(90deg, #22c55e, #f2c94c, #ef4444); transition: width .05s linear; }
+    .listen-meter > span { position: absolute; top: -2px; bottom: -2px; width: 3px; background: #fff; border-radius: 2px; }
+    button.listening { background: linear-gradient(135deg, #b45309, #f97316); animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,.55); } 50% { box-shadow: 0 0 0 10px rgba(249,115,22,0); } }
+    .timer.running .time { color: #4ade80; }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
+    .preset-row button { min-height: 38px; padding: 6px 14px; font-size: .9rem; }
+    input[type="range"] { width: 100%; accent-color: #5ba1ff; }
+    /* Bandeau toujours visible (même par-dessus l'analyse photo) pendant la bande son */
+    .track-hud { position: fixed; top: max(8px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; gap: 14px; align-items: center; padding: 8px 18px; border-radius: 99px; background: rgba(7,18,37,.92); border: 1px solid rgba(255,255,255,.25); box-shadow: 0 10px 24px rgba(0,0,0,.4); font-weight: 900; font-size: 1.05rem; white-space: nowrap; pointer-events: none; }
+    .track-hud.marques { border-color: #f2c94c; color: #f2c94c; }
+    .track-hud.prets { border-color: #f97316; color: #fdba74; }
+    .track-hud.go { border-color: #4ade80; color: #4ade80; }
+    .track-hud .hud-time { font-variant-numeric: tabular-nums; color: #4ade80; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="brand">
+        <img class="logo" src="icon-square.png" alt="Icône Sifflet" />
+        <div class="brand-text">
+          <h1>Sifflet</h1>
+          <div class="subtitle">Départs au coup de sifflet · photo finish</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="btnInstall" class="primary hidden" type="button">⬇️ Installer l'application</button>
+        <button id="btnStats" class="secondary" type="button">📊 Stats</button>
+        <button id="btnAdmin" class="secondary" type="button">🔒 Admin</button>
+      </div>
+    </div>
+    <p id="updateBanner" class="note hidden" style="background:rgba(29,99,255,.16);border:1px solid rgba(93,161,255,.4);border-radius:14px;padding:10px 14px;margin:-4px 0 14px;">
+      Une nouvelle version de l'application est prête —
+      <button id="btnUpdateReload" type="button" class="secondary" style="min-height:32px;padding:6px 12px;margin-left:6px;">Actualiser</button>
+    </p>
+
+    <div class="grid">
+      <section class="card">
+        <div class="depart-tabs" role="tablist" aria-label="Gestion des départs">
+          <button type="button" class="depart-tab" data-depart="manuel">🙋 Départs manuels</button>
+          <button type="button" class="depart-tab" data-depart="bande">🔊 Bande son</button>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label id="starterLabel" for="starterSelect">Démarreur</label>
+            <select id="starterSelect"><option value="">— Choisir dans la classe —</option></select>
+            <input id="starterManual" type="text" placeholder="Prénom (saisie manuelle)" autocomplete="off" class="hidden" style="margin-top:8px;" />
+            <p id="targetHint" class="target-badge hidden"></p>
+          </div>
+        </div>
+
+        <div class="row" id="relayeurRow">
+          <div class="field">
+            <label for="relayeurSelect">Relayeur</label>
+            <select id="relayeurSelect"><option value="">— Choisir dans la classe —</option></select>
+            <input id="relayeurManual" type="text" placeholder="Prénom (saisie manuelle)" autocomplete="off" class="hidden" style="margin-top:8px;" />
+          </div>
+        </div>
+
+        <!-- Mode 1 : départs manuels (le prof siffle lui-même) -->
+        <div id="manualPanel">
+          <div class="row"><button id="btnListen" class="primary full" type="button">🎙️ Démarrer au coup de sifflet</button></div>
+          <div id="listenMeterWrap" class="hidden">
+            <div class="listen-meter" title="Niveau du sifflet capté"><div id="listenMeterBar"></div><span id="listenMeterMark"></span></div>
+            <p id="listenNote" class="note" style="margin:6px 0 0;">Micro actif : siffle pour lancer le temps de course.</p>
+          </div>
+          <div class="row"><button id="btnStart" class="success full" type="button">▶️ Top départ (bouton)</button></div>
+        </div>
+
+        <!-- Mode 2 : départs pilotés par la bande son -->
+        <div id="trackPanel" class="hidden">
+          <div class="row">
+            <button id="btnTrackPlay" class="success" type="button" style="flex:2;">▶️ Lancer la bande son</button>
+            <button id="btnTrackStop" class="danger" type="button" style="flex:1;" disabled>⏹️ Fin</button>
+          </div>
+          <div id="cuePanel" class="cue-panel">
+            <div id="cueText" class="cue-text">Prêt</div>
+            <div id="cueSub" class="cue-sub">24 départs · 1 toutes les 30 s · 12 min</div>
+            <div class="track-progress"><div id="trackProgressBar"></div></div>
+          </div>
+          <audio id="trackAudio" src="bande-son-sifflet.mp3" preload="auto"></audio>
+        </div>
+
+        <div class="row"><button id="btnStop" class="danger full" type="button" disabled>⏹️ Annuler la course en cours</button></div>
+        <div class="row"><button id="btnReset" class="warn full" type="button">🔄 Remettre à zéro</button></div>
+
+        <div class="timer" id="timerBox">
+          <div>
+            <div id="timeDisplay" class="time">00:12</div>
+            <div id="status" class="status">Prêt</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>📷 Aperçu caméra</h2>
+        <div class="video-wrap">
+          <video id="video" playsinline autoplay muted></video>
+        </div>
+
+        <div class="gallery">
+          <h2>🖼️ Galerie des photos finish</h2>
+          <div id="galleryGrid" class="thumb-grid"></div>
+          <p id="galleryEmpty" class="note">Aucune photo pour le moment.</p>
+          <div class="row" style="margin-top:14px;">
+            <button id="btnExportCsv" class="success full" type="button" disabled>📥 Exporter CSV (toutes les tentatives notées)</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="photoOverlay" class="admin-overlay hidden">
+    <div class="card photo-modal">
+      <h2 style="margin:0;">🔎 Analyse de la photo finish</h2>
+      <p id="photoParticipants" class="note" style="margin-top:8px;"></p>
+      <p id="photoTargetBadge" class="target-badge hidden"></p>
+
+      <div class="photo-analysis-grid">
+        <div class="photo-analysis-left">
+          <img id="photo" alt="Photo capturée" class="hidden" />
+          <a id="downloadLink" class="dl full hidden" download="photo-finish-sifflet.jpg">⬇️ Télécharger cette photo</a>
+        </div>
+        <div class="photo-analysis-right">
+          <h2 id="ecartPanelTitle" style="margin-top:0;">🎯 Écart à la cible</h2>
+          <p id="ecartHint" class="note"></p>
+          <div id="ecartButtons" class="ecart-buttons-grid"></div>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:flex-end; margin-top:18px;">
+        <button id="btnPhotoClose" class="secondary" type="button">✖️ Fermer</button>
+        <button id="btnPhotoSaveClose" class="success" type="button">💾 Enregistrer et fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminOverlay" class="admin-overlay hidden">
+    <div class="card admin-modal">
+      <div class="admin-modal-header">
+        <h2 style="margin:0;">Administration</h2>
+        <div class="row" style="gap:8px;">
+          <button id="btnAdminLock" class="secondary hidden" type="button">🔒 Verrouiller</button>
+          <button id="btnAdminClose" class="secondary" type="button">✖️ Fermer</button>
+        </div>
+      </div>
+
+      <div id="adminGate" style="margin-top:12px;">
+        <p class="note">Code administrateur requis.</p>
+        <div class="row">
+          <div class="field" style="max-width:220px;">
+            <input id="adminPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Code à 4 chiffres" autocomplete="off" />
+          </div>
+          <button id="btnAdminUnlock" class="primary" type="button">🔓 Déverrouiller</button>
+        </div>
+        <p id="adminPinError" class="note hidden" style="color:#f87171;">Code incorrect.</p>
+      </div>
+
+      <div id="adminContent" class="hidden" style="margin-top:12px;">
+        <div class="row">
+          <button id="btnCameraToggle" class="primary full" type="button">📷 Activer la caméra</button>
+        </div>
+        <p id="cameraAdminNote" class="note">Caméra inactive.</p>
+        <div class="row">
+          <button id="btnScanQr" class="secondary full" type="button">📷 Scanner un QR code (résultats d'un autre appareil)</button>
+        </div>
+
+        <div class="admin-tabs" role="tablist">
+          <button type="button" class="admin-tab-btn active" data-tab="course">🏁 Réglages de course</button>
+          <button type="button" class="admin-tab-btn" data-tab="classe">👥 Classe</button>
+          <button type="button" class="admin-tab-btn" data-tab="galerie">🖼️ Galerie</button>
+        </div>
+
+        <div class="admin-tab-panel" data-tab-panel="course">
+          <h2 style="margin-top:0;">⚙️ Mode de course</h2>
+          <div class="row">
+            <button type="button" class="secondary mode-btn full" data-mode="relais" style="flex:1;">🔁 Relais (démarreur + relayeur)</button>
+            <button type="button" class="secondary mode-btn full" data-mode="individuel" style="flex:1;">🙋 Individuel (coureur seul)</button>
+          </div>
+
+          <h2 style="margin-top:20px;">⏱️ Temps de course</h2>
+          <p class="note" style="margin-top:-6px;">Durée du timer entre le coup de sifflet et la photo finish.</p>
+          <div class="stepper-row">
+            <button id="btnMinus" class="danger stepper-btn" type="button">−</button>
+            <div id="secondsDisplay" class="seconds-display" aria-live="polite">12s</div>
+            <button id="btnPlus" class="success stepper-btn" type="button">+</button>
+          </div>
+          <div class="preset-row">
+            <button type="button" class="secondary preset-btn" data-sec="6">6 s</button>
+            <button type="button" class="secondary preset-btn" data-sec="8">8 s</button>
+            <button type="button" class="secondary preset-btn" data-sec="10">10 s</button>
+            <button type="button" class="secondary preset-btn" data-sec="12">12 s</button>
+            <button type="button" class="secondary preset-btn" data-sec="15">15 s</button>
+            <button type="button" class="secondary preset-btn" data-sec="20">20 s</button>
+          </div>
+          <p id="trackDurationWarn" class="note hidden" style="color:#fbbf24;">⚠️ Avec la bande son, un départ a lieu toutes les 30 s : garde un temps de course inférieur à 25 s pour avoir le temps de noter l'écart.</p>
+          <input id="seconds" type="hidden" value="12" />
+
+          <h2 style="margin-top:20px;">🎙️ Détection du coup de sifflet (départs manuels)</h2>
+          <label for="whistleSensitivity" class="note">Sensibilité : <strong id="whistleSensitivityLabel">5</strong> / 10</label>
+          <input id="whistleSensitivity" type="range" min="1" max="10" step="1" value="5" />
+          <p class="note">Augmente si le sifflet n'est pas détecté de loin ; diminue si des bruits du gymnase (cris, chaussures qui crissent) déclenchent des départs.</p>
+
+          <h2 style="margin-top:20px;">📏 Unité de l'écart à la cible</h2>
+          <div class="row">
+            <button type="button" class="secondary unit-btn full" data-unit="plots" style="flex:1;">📏 Plots</button>
+            <button type="button" class="secondary unit-btn full" data-unit="metres" style="flex:1;">📐 Mètres</button>
+          </div>
+
+          <h2 style="margin-top:20px;">🎯 Course individuelle</h2>
+          <div class="row">
+            <label class="checkbox-row" for="targetEnabledCheckbox" style="flex:1;">
+              <input type="checkbox" id="targetEnabledCheckbox" />
+              Indiquer une cible par élève
+            </label>
+            <button type="button" id="btnTargetInfo" class="info-btn" aria-label="Plus d'informations">i</button>
+          </div>
+          <p id="targetExplainNote" class="note hidden" style="margin-top:6px;">
+            À l'import d'une classe : la cible se lit en colonne B si le fichier a « NOM Prénom » combinés en colonne A, ou en colonne C si Nom (colonne A) et Prénom (colonne B) sont séparés. Elle peut aussi être saisie ou corrigée élève par élève ci-dessous.
+          </p>
+        </div>
+
+        <div class="admin-tab-panel hidden" data-tab-panel="classe">
+          <h2 style="margin-top:0;">👥 Classes</h2>
+          <div class="row">
+            <div class="field">
+              <label for="classSelect">Classe active</label>
+              <select id="classSelect"></select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="newClassName">Nouvelle classe</label>
+              <input id="newClassName" type="text" placeholder="Ex. 6°1" autocomplete="off" />
+            </div>
+          </div>
+          <div class="row">
+            <button id="btnCreateClass" class="success full" type="button">➕ Créer cette classe</button>
+          </div>
+          <div class="row">
+            <button id="btnRenameClass" class="secondary" type="button" style="flex:1;">✏️ Renommer</button>
+            <button id="btnDeleteClass" class="danger" type="button" style="flex:1;">🗑️ Supprimer</button>
+          </div>
+
+          <h2 style="margin-top:20px;">📥 Importer une classe (format habituel)</h2>
+          <div class="row">
+            <div class="field">
+              <label for="classFile">Fichier CSV/Excel — colonne A : Nom (seule l'initiale est gardée), colonne B : Prénom</label>
+              <input id="classFile" type="file" accept=".csv,.txt,.tsv,.xlsx" />
+            </div>
+          </div>
+          <div class="row">
+            <button id="btnClearRoster" class="secondary" type="button">🗑️ Vider les élèves de la classe active</button>
+          </div>
+          <p id="rosterStatus" class="note">Aucune classe active.</p>
+
+          <h2 style="margin-top:20px;">➕ Ajouter un élève</h2>
+          <div class="row">
+            <div class="field">
+              <label for="addNom">Nom</label>
+              <input id="addNom" type="text" placeholder="Ex. Martin" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="addPrenom">Prénom</label>
+              <input id="addPrenom" type="text" placeholder="Ex. Lucas" autocomplete="off" />
+            </div>
+          </div>
+          <div class="row hidden" id="addCibleRow">
+            <div class="field" style="max-width:200px;">
+              <label for="addCible">Cible</label>
+              <input id="addCible" type="text" inputmode="decimal" placeholder="Ex. 3,20" autocomplete="off" />
+            </div>
+          </div>
+          <div class="row"><button id="btnAddStudent" class="success full" type="button">➕ Ajouter à la classe active</button></div>
+
+          <h2 style="margin-top:20px;">👥 Élèves de la classe active (<span id="rosterCount">0</span>)</h2>
+          <div id="rosterManageList" class="roster-manage-list"></div>
+        </div>
+
+        <div class="admin-tab-panel hidden" data-tab-panel="galerie">
+          <h2 style="margin-top:0;">🖼️ Galerie</h2>
+          <div class="row"><button id="btnClearGallery" class="secondary full" type="button">🗑️ Effacer la galerie</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="statsOverlay" class="admin-overlay hidden">
+    <div class="card admin-modal">
+      <div class="row" style="justify-content:space-between;align-items:center;">
+        <h2 style="margin:0;">Statistiques</h2>
+        <button id="btnStatsClose" class="secondary" type="button">✖️ Fermer</button>
+      </div>
+      <div id="statsResultsWrap" class="results-table-wrap" style="margin-top:12px;"></div>
+
+      <div class="row" style="margin-top:14px;">
+        <button id="btnStatsQrExport" class="secondary full" type="button">📱 Exporter en QR code</button>
+      </div>
+      <div id="qrExportWrap" class="qr-wrap hidden">
+        <div id="qrCodeCanvas" class="qr-box"></div>
+      </div>
+
+      <div id="importedStatsWrap"></div>
+    </div>
+  </div>
+
+  <div id="trackHud" class="track-hud hidden"><span id="hudCue"></span><span id="hudTime" class="hud-time"></span></div>
+
+  <div class="signature">by Quentin Delisle</div>
+  <div id="versionTag" class="version-tag"></div>
+
+  <!-- Lecture des fichiers Excel (.xlsx) pour l'import de classe. Nécessite une connexion internet
+       au moment de l'import uniquement (le CSV, lui, fonctionne toujours hors-ligne). -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <!-- Génération et lecture de QR codes pour transférer les résultats (Stats) entre appareils,
+       sans passer par les photos. Nécessitent une connexion internet au premier chargement. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js" defer></script>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const secondsInput = $('seconds');
+    const starterLabel = $('starterLabel');
+    const starterSelect = $('starterSelect');
+    const starterManual = $('starterManual');
+    const targetHint = $('targetHint');
+    const relayeurRow = $('relayeurRow');
+    const relayeurSelect = $('relayeurSelect');
+    const relayeurManual = $('relayeurManual');
+    const btnCameraToggle = $('btnCameraToggle');
+    const cameraAdminNote = $('cameraAdminNote');
+    const btnScanQr = $('btnScanQr');
+    const adminTabButtons = Array.from(document.querySelectorAll('.admin-tab-btn'));
+    const adminTabPanels = Array.from(document.querySelectorAll('.admin-tab-panel'));
+    const btnStatsQrExport = $('btnStatsQrExport');
+    const qrExportWrap = $('qrExportWrap');
+    const qrCodeCanvas = $('qrCodeCanvas');
+    const importedStatsWrap = $('importedStatsWrap');
+    const btnStart = $('btnStart');
+    const btnReset = $('btnReset');
+    const btnMinus = $('btnMinus');
+    const btnPlus = $('btnPlus');
+    const secondsDisplay = $('secondsDisplay');
+    const btnStop = $('btnStop');
+    const btnClearGallery = $('btnClearGallery');
+    const timeDisplay = $('timeDisplay');
+    const statusEl = $('status');
+    const video = $('video');
+    const photo = $('photo');
+    const downloadLink = $('downloadLink');
+    const galleryGrid = $('galleryGrid');
+    const galleryEmpty = $('galleryEmpty');
+    const classFile = $('classFile');
+    const btnClearRoster = $('btnClearRoster');
+    const rosterStatus = $('rosterStatus');
+    const rosterCount = $('rosterCount');
+    const rosterManageList = $('rosterManageList');
+    const classSelect = $('classSelect');
+    const newClassName = $('newClassName');
+    const btnCreateClass = $('btnCreateClass');
+    const btnRenameClass = $('btnRenameClass');
+    const btnDeleteClass = $('btnDeleteClass');
+    const btnTargetInfo = $('btnTargetInfo');
+    const ecartButtons = $('ecartButtons');
+    const ecartHint = $('ecartHint');
+    const photoOverlay = $('photoOverlay');
+    const btnPhotoClose = $('btnPhotoClose');
+    const btnPhotoSaveClose = $('btnPhotoSaveClose');
+    const photoParticipants = $('photoParticipants');
+    const photoTargetBadge = $('photoTargetBadge');
+    const btnExportCsv = $('btnExportCsv');
+    const btnInstall = $('btnInstall');
+    const updateBanner = $('updateBanner');
+    const btnUpdateReload = $('btnUpdateReload');
+    const btnAdmin = $('btnAdmin');
+    const adminOverlay = $('adminOverlay');
+    const btnAdminClose = $('btnAdminClose');
+    const adminGate = $('adminGate');
+    const adminContent = $('adminContent');
+    const adminPinInput = $('adminPinInput');
+    const adminPinError = $('adminPinError');
+    const btnAdminUnlock = $('btnAdminUnlock');
+    const btnAdminLock = $('btnAdminLock');
+    const modeButtons = Array.from(document.querySelectorAll('.mode-btn'));
+    const targetEnabledCheckbox = $('targetEnabledCheckbox');
+    const targetExplainNote = $('targetExplainNote');
+    const addNom = $('addNom');
+    const addPrenom = $('addPrenom');
+    const addCibleRow = $('addCibleRow');
+    const addCible = $('addCible');
+    const btnAddStudent = $('btnAddStudent');
+    const btnStats = $('btnStats');
+    const statsOverlay = $('statsOverlay');
+    const btnStatsClose = $('btnStatsClose');
+    const statsResultsWrap = $('statsResultsWrap');
+    const ecartPanelTitle = $('ecartPanelTitle');
+    const unitButtons = Array.from(document.querySelectorAll('.unit-btn'));
+    const departTabs = Array.from(document.querySelectorAll('.depart-tab'));
+    const presetButtons = Array.from(document.querySelectorAll('.preset-btn'));
+    const manualPanel = $('manualPanel');
+    const trackPanel = $('trackPanel');
+    const btnListen = $('btnListen');
+    const listenMeterWrap = $('listenMeterWrap');
+    const listenMeterBar = $('listenMeterBar');
+    const listenMeterMark = $('listenMeterMark');
+    const listenNote = $('listenNote');
+    const btnTrackPlay = $('btnTrackPlay');
+    const btnTrackStop = $('btnTrackStop');
+    const cuePanel = $('cuePanel');
+    const cueText = $('cueText');
+    const cueSub = $('cueSub');
+    const trackProgressBar = $('trackProgressBar');
+    const trackAudio = $('trackAudio');
+    const timerBox = $('timerBox');
+    const trackDurationWarn = $('trackDurationWarn');
+    const whistleSensitivity = $('whistleSensitivity');
+    const whistleSensitivityLabel = $('whistleSensitivityLabel');
+    const trackHud = $('trackHud');
+    const hudCue = $('hudCue');
+    const hudTime = $('hudTime');
+    const MANUAL_OPTION = '__manual__';
+    const ADMIN_CODE = '0000';
+    const APP_VERSION = '2.0.0';
+
+    let stream = null;
+    let countdownTimer = null;
+    let remaining = 12;
+    let audioCtx = null;
+    let takingPhoto = false;
+    let photoIndex = 0;
+    let galleryItems = [];
+    let currentAttemptIndex = -1;
+    let adminUnlocked = false;
+    const GALLERY_STORAGE_KEY = 'relais12s_gallery_v2';
+    const ROSTER_STORAGE_KEY = 'relais12s_roster_v1'; // ancien format (une seule classe), conservé pour migration
+    const CLASSES_STORAGE_KEY = 'relais12s_classes_v1';
+    const ACTIVE_CLASS_STORAGE_KEY = 'relais12s_active_class_v1';
+    const MODE_STORAGE_KEY = 'relais12s_mode_v1';
+    const TARGET_ENABLED_STORAGE_KEY = 'relais12s_target_enabled_v1';
+    const ECART_UNIT_STORAGE_KEY = 'relais12s_ecart_unit_v1';
+    const IMPORTED_STATS_STORAGE_KEY = 'relais12s_imported_stats_v1';
+    // (les clés de stockage gardent le préfixe "relais12s" pour conserver classes et résultats existants)
+    const DEPART_MODE_STORAGE_KEY = 'sifflet_depart_mode_v1';
+    const SECONDS_STORAGE_KEY = 'sifflet_race_seconds_v1';
+    const WHISTLE_SENS_STORAGE_KEY = 'sifflet_whistle_sens_v1';
+    const MAX_GALLERY_ITEMS = 200;
+    const MIN_SECONDS = 1;
+    const MAX_SECONDS = 3600;
+    let classes = []; // [{ id, name, students: [...] }] — plusieurs classes gérées en parallèle
+    let activeClassId = null;
+    let roster = []; // toujours un alias des élèves de la classe active (voir syncRosterAlias)
+    let raceMode = 'relais';
+    let targetEnabled = false;
+    let importedStats = []; // résultats reçus par QR d'autres appareils (Stats uniquement, pas de photos)
+    let qrScanning = false;
+    let qrScanCanvas = null;
+    let qrCodeInstance = null;
+    let ecartUnit = 'plots';
+
+    // ---- Mode de course : relais (démarreur + relayeur) ou individuel (coureur seul) ----
+
+    function loadRaceMode() {
+      try {
+        const v = localStorage.getItem(MODE_STORAGE_KEY);
+        if (v === 'relais' || v === 'individuel') raceMode = v;
+      } catch (err) {}
+      applyRaceMode();
+    }
+
+    function setRaceMode(mode) {
+      raceMode = mode;
+      try { localStorage.setItem(MODE_STORAGE_KEY, mode); } catch (err) {}
+      applyRaceMode();
+    }
+
+    function applyRaceMode() {
+      const isIndividuel = raceMode === 'individuel';
+      relayeurRow.classList.toggle('hidden', isIndividuel);
+      starterLabel.textContent = isIndividuel ? 'Coureur' : 'Démarreur';
+      modeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.mode === raceMode));
+      updateTargetHint();
+    }
+
+    // ---- Cible individuelle (mètres) par élève ----
+
+    function loadTargetSetting() {
+      try {
+        targetEnabled = localStorage.getItem(TARGET_ENABLED_STORAGE_KEY) === '1';
+      } catch (err) {}
+      applyTargetSetting();
+    }
+
+    function setTargetEnabled(value) {
+      targetEnabled = value;
+      try { localStorage.setItem(TARGET_ENABLED_STORAGE_KEY, value ? '1' : '0'); } catch (err) {}
+      applyTargetSetting();
+    }
+
+    function applyTargetSetting() {
+      targetEnabledCheckbox.checked = targetEnabled;
+      addCibleRow.classList.toggle('hidden', !targetEnabled);
+      renderRosterManageList();
+      updateTargetHint();
+    }
+
+    function parseTargetMeters(value) {
+      const s = (value ?? '').toString().trim().replace(',', '.');
+      if (!s) return null;
+      const n = Number(s);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function formatMeters(n) {
+      return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
+    // La cible suit la même unité que l'écart (plots ou mètres), réglable en Admin.
+    function formatTarget(n) {
+      return `${formatMeters(n)} ${ecartUnitLabel()}`;
+    }
+
+    function updateTargetHint() {
+      const isIndividuel = raceMode === 'individuel';
+      if (!isIndividuel || !targetEnabled || starterSelect.value === MANUAL_OPTION || !starterSelect.value) {
+        targetHint.classList.add('hidden');
+        return;
+      }
+      const student = roster.find((s) => s.display === starterSelect.value);
+      if (!student || student.cible === null || student.cible === undefined) {
+        targetHint.classList.add('hidden');
+        return;
+      }
+      targetHint.textContent = `🎯 Cible : ${formatTarget(student.cible)}`;
+      targetHint.classList.remove('hidden');
+    }
+
+    // ---- Unité de l'écart à la cible : plots ou mètres (réglable en Admin) ----
+
+    function loadEcartUnit() {
+      try {
+        const v = localStorage.getItem(ECART_UNIT_STORAGE_KEY);
+        if (v === 'plots' || v === 'metres') ecartUnit = v;
+      } catch (err) {}
+      applyEcartUnit();
+    }
+
+    function setEcartUnit(unit) {
+      ecartUnit = unit;
+      try { localStorage.setItem(ECART_UNIT_STORAGE_KEY, unit); } catch (err) {}
+      applyEcartUnit();
+    }
+
+    function applyEcartUnit() {
+      unitButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.unit === ecartUnit));
+      const isMetres = ecartUnit === 'metres';
+      ecartPanelTitle.textContent = isMetres ? '🎯 Écart à la cible (en mètres)' : '🎯 Écart à la cible (en plots)';
+      renderEcartPanel();
+      renderGallery({ keepSelection: true });
+      refreshStatsLiveView();
+      updateTargetHint();
+      renderRosterManageList();
+      if (!photoOverlay.classList.contains('hidden') && currentAttemptIndex >= 0) {
+        refreshPhotoTargetBadge();
+      }
+    }
+
+    // ---- Notation de l'écart à la cible (plots ou mètres), -10 à +10, via boutons colorés ----
+
+    function ecartKind(value) {
+      if (value === 0) return 'target';
+      return value < 0 ? 'neg' : 'pos';
+    }
+
+    function ecartColor(value) {
+      if (value === 0) return '#5ba1ff';
+      return value < 0 ? '#ef4444' : '#22c55e';
+    }
+
+    // Dégradé rouge (−10) → bleu (cible) → vert (+10), calculé une fois par bouton.
+    function lerpChannel(a, b, t) { return Math.round(a + (b - a) * t); }
+    function lerpColor(c1, c2, t) {
+      return `rgb(${lerpChannel(c1[0], c2[0], t)}, ${lerpChannel(c1[1], c2[1], t)}, ${lerpChannel(c1[2], c2[2], t)})`;
+    }
+    const ECART_COLOR_NEG = [239, 68, 68];
+    const ECART_COLOR_MID = [91, 161, 255];
+    const ECART_COLOR_POS = [34, 197, 94];
+    function ecartButtonColor(value) {
+      if (value === 0) return `rgb(${ECART_COLOR_MID.join(',')})`;
+      if (value < 0) return lerpColor(ECART_COLOR_NEG, ECART_COLOR_MID, (value + 10) / 10);
+      return lerpColor(ECART_COLOR_MID, ECART_COLOR_POS, value / 10);
+    }
+
+    function ecartLabel(value) {
+      if (value === null || value === undefined) return 'Non noté';
+      if (value === 0) return 'Cible atteinte';
+      const abs = Math.abs(value);
+      const sign = value > 0 ? '+' : '−';
+      if (ecartUnit === 'metres') return `${sign}${abs} m`;
+      return `${sign}${abs} plot${abs > 1 ? 's' : ''}`;
+    }
+
+    function ecartUnitLabel() {
+      return ecartUnit === 'metres' ? 'm' : 'plots';
+    }
+
+    function participantsLabel(meta) {
+      if (meta.mode === 'individuel') return meta.starter || '';
+      return [meta.starter, meta.relayeur].filter(Boolean).join(' → ');
+    }
+
+    function buildEcartButtons() {
+      const values = [];
+      for (let v = -10; v <= 10; v++) values.push(v);
+      ecartButtons.innerHTML = values.map((v) => {
+        const label = v === 0 ? 'Cible' : (v > 0 ? `+${v}` : String(v));
+        return `<button type="button" class="ecart-btn${v === 0 ? ' zero' : ''}" data-value="${v}" style="background:${ecartButtonColor(v)};" disabled>${label}</button>`;
+      }).join('');
+      ecartButtons.querySelectorAll('.ecart-btn').forEach((btn) => {
+        btn.addEventListener('click', () => setEcart(Number(btn.dataset.value)));
+      });
+    }
+
+    function renderEcartPanel() {
+      const hasAttempt = currentAttemptIndex >= 0 && galleryItems[currentAttemptIndex];
+      const item = hasAttempt ? galleryItems[currentAttemptIndex] : null;
+      const noted = hasAttempt && item.meta.ecart !== null && item.meta.ecart !== undefined;
+      const currentValue = noted ? item.meta.ecart : null;
+
+      ecartButtons.querySelectorAll('.ecart-btn').forEach((btn) => {
+        btn.disabled = !hasAttempt;
+        btn.classList.toggle('selected', hasAttempt && noted && Number(btn.dataset.value) === currentValue);
+      });
+
+      if (!hasAttempt) {
+        ecartHint.textContent = "Capture une photo pour pouvoir noter l'écart.";
+      } else {
+        const who = participantsLabel(item.meta);
+        ecartHint.textContent = noted
+          ? (who ? `Écart noté pour : ${who}` : 'Écart noté')
+          : (who ? `Choisis l'écart pour : ${who}` : "Choisis l'écart à noter ci-dessous");
+      }
+    }
+
+    function setEcart(value) {
+      if (currentAttemptIndex < 0 || !galleryItems[currentAttemptIndex]) return;
+      galleryItems[currentAttemptIndex].meta.ecart = value;
+      saveGallery();
+      renderEcartPanel();
+      renderGallery({ keepSelection: true });
+      refreshStatsLiveView();
+    }
+
+    function csvEscape(value) {
+      const s = String(value ?? '');
+      return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+
+    function exportCsv() {
+      if (!galleryItems.length) {
+        alert('Aucune tentative à exporter pour le moment.');
+        return;
+      }
+      const header = ['Date', 'Heure', 'Mode', 'Coureur(s)', 'Décompte (s)', `Écart (${ecartUnitLabel()})`, 'Résultat'];
+      const rows = galleryItems
+        .slice()
+        .reverse() // ordre chronologique dans l'export
+        .map((item) => {
+          const d = item.meta.createdAt ? new Date(item.meta.createdAt) : null;
+          const dateStr = d ? d.toLocaleDateString('fr-FR') : '';
+          const timeStr = d ? d.toLocaleTimeString('fr-FR') : '';
+          const ecart = item.meta.ecart;
+          const ecartNum = (ecart === null || ecart === undefined) ? '' : ecart;
+          return [
+            dateStr,
+            timeStr,
+            item.meta.mode === 'individuel' ? 'Individuel' : 'Relais',
+            participantsLabel(item.meta),
+            item.meta.duration != null ? item.meta.duration : '',
+            ecartNum,
+            ecartLabel(ecart),
+          ];
+        });
+      const lines = [header, ...rows].map((r) => r.map(csvEscape).join(';'));
+      const csvContent = '﻿' + lines.join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+      a.href = url;
+      a.download = `sifflet-resultats-${stamp}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    // ---- Résultats par élève (bouton Stats, accès libre) ----
+
+    function computeResultsByStudent() {
+      const map = new Map();
+      galleryItems.forEach((item) => {
+        const m = item.meta;
+        const participants = m.mode === 'individuel' ? [m.starter] : [m.starter, m.relayeur];
+        participants.filter(Boolean).forEach((name) => {
+          if (!map.has(name)) map.set(name, { count: 0, ecarts: [], target: null });
+          const entry = map.get(name);
+          entry.count += 1;
+          if (m.ecart !== null && m.ecart !== undefined) entry.ecarts.push(m.ecart);
+          // galleryItems est trié du plus récent au plus ancien : la première cible rencontrée
+          // pour cet élève est donc sa cible la plus récente.
+          if (entry.target === null && m.targetMeters !== null && m.targetMeters !== undefined) {
+            entry.target = m.targetMeters;
+          }
+        });
+      });
+      return Array.from(map.entries())
+        .map(([name, data]) => {
+          const noted = data.ecarts.length;
+          const avg = noted ? data.ecarts.reduce((a, b) => a + b, 0) / noted : null;
+          const best = noted ? data.ecarts.reduce((a, b) => (Math.abs(b) < Math.abs(a) ? b : a)) : null;
+          return { name, count: data.count, noted, avg, best, target: data.target };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+    }
+
+    function renderResultsTable() {
+      const rows = computeResultsByStudent();
+      if (!rows.length) {
+        statsResultsWrap.innerHTML = '<p class="note">Aucune tentative enregistrée pour le moment.</p>';
+        return;
+      }
+      statsResultsWrap.innerHTML = `
+        <table class="results-table">
+          <thead>
+            <tr><th>Élève</th><th>Cible visée</th><th>Tentatives</th><th>Notées</th><th>Moyenne (${ecartUnitLabel()})</th><th>Meilleur écart</th></tr>
+          </thead>
+          <tbody>
+            ${rows.map((r) => `
+              <tr>
+                <td>${escapeHtml(r.name)}</td>
+                <td class="num">${r.target === null ? '—' : formatTarget(r.target)}</td>
+                <td class="num">${r.count}</td>
+                <td class="num">${r.noted}</td>
+                <td class="num">${r.avg === null ? '—' : (r.avg > 0 ? '+' : '') + r.avg.toFixed(1)}</td>
+                <td class="num">${r.best === null ? '—' : ecartLabel(r.best)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function refreshStatsLiveView() {
+      if (!statsOverlay.classList.contains('hidden')) {
+        renderResultsTable();
+      }
+    }
+
+    function openStats() {
+      statsOverlay.classList.remove('hidden');
+      qrExportWrap.classList.add('hidden');
+      renderResultsTable();
+      renderImportedStats();
+    }
+
+    function closeStats() {
+      statsOverlay.classList.add('hidden');
+    }
+
+    // ---- Transfert des résultats (Stats uniquement, jamais les photos) entre appareils via QR
+    // code : utile quand plusieurs iPads élèves tournent en parallèle et qu'il faut ramener
+    // leurs résultats sur l'appareil principal, sans câble ni compte partagé. ----
+
+    function buildStatsQrPayload() {
+      const rows = computeResultsByStudent();
+      const cls = getActiveClass();
+      return JSON.stringify({
+        v: 1,
+        cls: cls ? cls.name : null,
+        rows: rows.map((r) => [r.name, r.target, r.count, r.noted, r.avg === null ? null : Math.round(r.avg * 10) / 10, r.best]),
+      });
+    }
+
+    function exportStatsQr() {
+      const rows = computeResultsByStudent();
+      if (!rows.length) {
+        alert('Aucune donnée à exporter pour le moment.');
+        return;
+      }
+      if (typeof QRCode === 'undefined') {
+        alert('La génération de QR code nécessite une connexion internet au premier chargement de l’appli.');
+        return;
+      }
+      qrCodeCanvas.innerHTML = '';
+      qrCodeInstance = new QRCode(qrCodeCanvas, {
+        text: buildStatsQrPayload(),
+        width: 240,
+        height: 240,
+        correctLevel: QRCode.CorrectLevel.L,
+      });
+      qrExportWrap.classList.remove('hidden');
+    }
+
+    function loadImportedStats() {
+      try {
+        const raw = localStorage.getItem(IMPORTED_STATS_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) importedStats = parsed;
+        }
+      } catch (err) {
+        console.warn('Impossible de charger les résultats importés', err);
+        importedStats = [];
+      }
+    }
+
+    function saveImportedStats() {
+      try { localStorage.setItem(IMPORTED_STATS_STORAGE_KEY, JSON.stringify(importedStats)); } catch (err) {}
+    }
+
+    function renderImportedStats() {
+      if (!importedStats.length) {
+        importedStatsWrap.innerHTML = '';
+        return;
+      }
+      importedStatsWrap.innerHTML = `
+        <div class="row" style="justify-content:space-between;align-items:center;margin-top:18px;">
+          <h2 style="margin:0;">📥 Résultats importés (QR)</h2>
+          <button type="button" class="secondary" id="btnClearImportedStats">🗑️ Effacer les imports</button>
+        </div>
+        ${importedStats.map((entry) => `
+          <div class="results-table-wrap" style="margin-top:10px;">
+            <p class="note" style="margin-bottom:6px;">${escapeHtml(entry.source)}</p>
+            <table class="results-table">
+              <thead>
+                <tr><th>Élève</th><th>Cible visée</th><th>Tentatives</th><th>Notées</th><th>Moyenne</th><th>Meilleur écart</th></tr>
+              </thead>
+              <tbody>
+                ${entry.rows.map((row) => {
+                  const [name, target, count, noted, avg, best] = row;
+                  return `<tr>
+                    <td>${escapeHtml(name)}</td>
+                    <td class="num">${target === null || target === undefined ? '—' : formatTarget(target)}</td>
+                    <td class="num">${count}</td>
+                    <td class="num">${noted}</td>
+                    <td class="num">${avg === null || avg === undefined ? '—' : (avg > 0 ? '+' : '') + avg.toFixed(1)}</td>
+                    <td class="num">${best === null || best === undefined ? '—' : ecartLabel(best)}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `).join('')}
+      `;
+      const btn = $('btnClearImportedStats');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          if (!confirm('Effacer tous les résultats importés par QR code ?')) return;
+          importedStats = [];
+          saveImportedStats();
+          renderImportedStats();
+        });
+      }
+    }
+
+    function handleScannedQrPayload(text) {
+      let payload;
+      try { payload = JSON.parse(text); } catch (err) { alert('QR code non reconnu.'); return; }
+      if (!payload || !Array.isArray(payload.rows)) { alert('QR code non reconnu.'); return; }
+      importedStats.push({
+        id: makeId(),
+        source: payload.cls || 'Appareil scanné',
+        importedAt: new Date().toISOString(),
+        rows: payload.rows,
+      });
+      saveImportedStats();
+      renderImportedStats();
+      alert(`Résultats importés : ${payload.rows.length} élève(s)${payload.cls ? ` (${payload.cls})` : ''}.`);
+    }
+
+    async function startQrScan() {
+      if (qrScanning) return;
+      if (typeof jsQR === 'undefined') {
+        alert('Le scan de QR code nécessite une connexion internet au premier chargement de l’appli.');
+        return;
+      }
+      const ready = await ensureCameraReady();
+      if (!ready) {
+        alert('Caméra indisponible pour scanner un QR code.');
+        return;
+      }
+      qrScanning = true;
+      btnScanQr.disabled = true;
+      btnScanQr.textContent = '🔎 Scan en cours... (vise le QR code)';
+      qrScanCanvas = qrScanCanvas || document.createElement('canvas');
+      const tick = () => {
+        if (!qrScanning) return;
+        if (video.readyState >= 2 && video.videoWidth) {
+          qrScanCanvas.width = video.videoWidth;
+          qrScanCanvas.height = video.videoHeight;
+          const ctx = qrScanCanvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, qrScanCanvas.width, qrScanCanvas.height);
+          const imageData = ctx.getImageData(0, 0, qrScanCanvas.width, qrScanCanvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
+          if (code && code.data) {
+            stopQrScan();
+            handleScannedQrPayload(code.data);
+            return;
+          }
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    function stopQrScan() {
+      qrScanning = false;
+      btnScanQr.disabled = false;
+      btnScanQr.textContent = "📷 Scanner un QR code (résultats d'un autre appareil)";
+    }
+
+    // ---- Import de classe (Pronote : colonne A = Nom, colonne B = Prénom) ----
+
+    function displayName(nom, prenom) {
+      const n = (nom || '').trim();
+      const p = (prenom || '').trim();
+      const initiale = n ? n.charAt(0).toUpperCase() : '';
+      if (p && initiale) return `${p} ${initiale}.`;
+      return p || n || '';
+    }
+
+    function makeId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    }
+
+    function detectDelimiter(firstLine) {
+      const candidates = [';', '\t', ','];
+      let best = ';';
+      let bestCount = -1;
+      candidates.forEach((c) => {
+        const count = firstLine.split(c).length - 1;
+        if (count > bestCount) { bestCount = count; best = c; }
+      });
+      return best;
+    }
+
+    function parseDelimitedText(text) {
+      const lines = text.split(/\r\n|\n|\r/).filter((l) => l.trim().length > 0);
+      if (!lines.length) return [];
+      const delim = detectDelimiter(lines[0]);
+      return lines.map((line) => line.split(delim).map((cell) => cell.trim().replace(/^"|"$/g, '')));
+    }
+
+    function looksLikeHeaderRow(row) {
+      const headerWords = ['nom', 'élève', 'eleve', 'élèves', 'eleves', 'last name', 'lastname', 'name'];
+      const first = (row[0] || '').trim().toLowerCase();
+      return headerWords.includes(first);
+    }
+
+    // Colonne B qui ressemble à une date de naissance (au lieu d'un prénom) : signe que la
+    // colonne A contient "NOM Prénom" combinés (cas Pronote fréquent).
+    function isDateLike(value) {
+      if (value instanceof Date) return true;
+      const s = (value ?? '').toString().trim();
+      if (!s) return false;
+      return /^\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}$/.test(s) || /^\d{4}-\d{1,2}-\d{1,2}$/.test(s);
+    }
+
+    function isUpperToken(token) {
+      const letters = token.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, '');
+      return letters.length > 0 && letters === letters.toUpperCase() && letters !== letters.toLowerCase();
+    }
+
+    // Colonne A qui a la forme "MARTIN Lucas" : un ou plusieurs mots en tête en MAJUSCULES
+    // suivis d'un mot qui ne l'est pas. Marche même quand la colonne B ne contient pas de date
+    // (par ex. quand elle contient une cible en mètres).
+    function looksLikeCombinedName(cell) {
+      const raw = (cell || '').toString().trim();
+      if (!raw) return false;
+      const tokens = raw.split(/\s+/);
+      if (tokens.length < 2) return false;
+      return isUpperToken(tokens[0]) && !isUpperToken(tokens[tokens.length - 1]);
+    }
+
+    // Sépare "MARTIN Lucas", "DE LA FONTAINE Marie-Claire", etc. : le Nom est la suite de mots
+    // en MAJUSCULES en tête, le Prénom est ce qui suit.
+    function splitNomPrenom(fullValue) {
+      const raw = (fullValue || '').toString().trim().replace(/\s+/g, ' ');
+      if (!raw) return { nom: '', prenom: '' };
+      const tokens = raw.split(' ');
+      let i = 0;
+      while (i < tokens.length && isUpperToken(tokens[i])) i++;
+      if (i === 0) i = 1; // aucun mot en majuscules détecté : on garde quand même le 1er comme Nom
+      if (i === tokens.length) i = tokens.length > 1 ? tokens.length - 1 : 1; // tout en majuscules
+      return { nom: tokens.slice(0, i).join(' '), prenom: tokens.slice(i).join(' ') };
+    }
+
+    function rowsToRoster(rows, options = {}) {
+      const { includeTarget = false } = options;
+      let data = rows;
+      if (data.length && looksLikeHeaderRow(data[0])) data = data.slice(1);
+
+      const sample = data.slice(0, 15).filter((r) => (r[0] || '').toString().trim());
+      const nameShapeCount = sample.filter((r) => looksLikeCombinedName(r[0])).length;
+      const dateLikeCount = sample.filter((r) => isDateLike(r[1])).length;
+      const combinedMode = sample.length > 0 && (nameShapeCount / sample.length >= 0.5 || dateLikeCount / sample.length >= 0.5);
+
+      const students = [];
+      data.forEach((cols) => {
+        let nom, prenom;
+        if (combinedMode) {
+          const split = splitNomPrenom(cols[0]);
+          nom = split.nom;
+          prenom = split.prenom;
+        } else {
+          nom = (cols[0] || '').toString().trim();
+          prenom = (cols[1] || '').toString().trim();
+        }
+        if (!nom && !prenom) return;
+        const student = { id: makeId(), nom, prenom, display: displayName(nom, prenom) };
+        if (includeTarget) {
+          const targetCol = combinedMode ? 1 : 2;
+          student.cible = parseTargetMeters(cols[targetCol]);
+        }
+        students.push(student);
+      });
+      students.sort((a, b) => a.display.localeCompare(b.display, 'fr'));
+      return { students, combinedMode };
+    }
+
+    function escapeHtml(str) {
+      return (str || '').toString().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Remplit les deux molettes (Démarreur/Coureur / Relayeur) avec la classe importée + une
+    // option de saisie manuelle, en conservant la sélection en cours si elle existe toujours.
+    function populateEleveSelects() {
+      [starterSelect, relayeurSelect].forEach((select) => {
+        const previous = select.value;
+        const options = ['<option value="">— Choisir dans la classe —</option>']
+          .concat(roster.map((s) => `<option value="${escapeHtml(s.display)}">${escapeHtml(s.display)}</option>`))
+          .concat([`<option value="${MANUAL_OPTION}">✏️ Saisie manuelle…</option>`]);
+        select.innerHTML = options.join('');
+        const stillExists = previous && (previous === MANUAL_OPTION || roster.some((s) => s.display === previous));
+        select.value = stillExists ? previous : '';
+      });
+    }
+
+    function syncManualVisibility(select, manualInput) {
+      const isManual = select.value === MANUAL_OPTION;
+      manualInput.classList.toggle('hidden', !isManual);
+      if (isManual) manualInput.focus();
+      else manualInput.value = '';
+    }
+
+    function getSelectedName(select, manualInput) {
+      if (select.value === MANUAL_OPTION) return manualInput.value.trim();
+      return select.value;
+    }
+
+    function renderRosterStatus() {
+      const cls = getActiveClass();
+      const count = cls ? cls.students.length : 0;
+      rosterCount.textContent = String(count);
+      if (!cls) {
+        rosterStatus.textContent = 'Aucune classe active. Crée ou importe une classe ci-dessus.';
+      } else if (!count) {
+        rosterStatus.textContent = `Classe « ${cls.name} » : aucun élève. Importe un fichier ou ajoute des élèves manuellement.`;
+      } else {
+        rosterStatus.textContent = `Classe « ${cls.name} » : ${count} élève(s).`;
+      }
+    }
+
+    function renderRosterManageList() {
+      if (!roster.length) {
+        rosterManageList.innerHTML = '<p class="note">Aucun élève dans la classe active.</p>';
+        return;
+      }
+      rosterManageList.innerHTML = roster.map((s) => `
+        <div class="roster-row">
+          <span>${escapeHtml(s.display)}</span>
+          ${targetEnabled ? `<input type="text" inputmode="decimal" class="roster-target-input" data-id="${s.id}" value="${s.cible !== null && s.cible !== undefined ? String(s.cible).replace('.', ',') : ''}" placeholder="Cible" />` : ''}
+          <button type="button" class="danger roster-remove" data-id="${s.id}">🗑️ Supprimer</button>
+        </div>
+      `).join('');
+      rosterManageList.querySelectorAll('.roster-remove').forEach((btn) => {
+        btn.addEventListener('click', () => removeStudent(btn.dataset.id));
+      });
+      rosterManageList.querySelectorAll('.roster-target-input').forEach((inp) => {
+        inp.addEventListener('change', () => updateStudentTarget(inp.dataset.id, inp.value));
+      });
+    }
+
+    // ---- Gestion de plusieurs classes en parallèle (ex. enchaîner plusieurs cours) ----
+
+    function getActiveClass() {
+      return classes.find((c) => c.id === activeClassId) || null;
+    }
+
+    // `roster` reste un simple alias vers les élèves de la classe active, pour que le reste du
+    // code (sélecteurs, ajout/suppression d'élève...) n'ait pas besoin de connaître les classes.
+    function syncRosterAlias() {
+      const active = getActiveClass();
+      roster = active ? active.students : [];
+    }
+
+    function saveClasses() {
+      try { localStorage.setItem(CLASSES_STORAGE_KEY, JSON.stringify(classes)); } catch (err) {
+        console.warn('Impossible de sauvegarder les classes', err);
+      }
+      try { localStorage.setItem(ACTIVE_CLASS_STORAGE_KEY, activeClassId || ''); } catch (err) {}
+    }
+
+    function renderClassSelector() {
+      if (!classes.length) {
+        classSelect.innerHTML = '<option value="">Aucune classe</option>';
+        classSelect.disabled = true;
+        return;
+      }
+      classSelect.disabled = false;
+      classSelect.innerHTML = classes
+        .map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)} (${c.students.length})</option>`)
+        .join('');
+      classSelect.value = activeClassId || '';
+    }
+
+    function loadClasses() {
+      try {
+        const raw = localStorage.getItem(CLASSES_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            classes = parsed.map((c) => ({
+              id: c.id || makeId(),
+              name: c.name || 'Classe',
+              students: Array.isArray(c.students) ? c.students.map((s) => ({ id: s.id || makeId(), ...s })) : [],
+            }));
+          }
+        } else {
+          // Migration depuis l'ancien format (une seule classe, sans nom).
+          const legacyRaw = localStorage.getItem(ROSTER_STORAGE_KEY);
+          if (legacyRaw) {
+            const parsedLegacy = JSON.parse(legacyRaw);
+            if (Array.isArray(parsedLegacy) && parsedLegacy.length) {
+              classes = [{
+                id: makeId(),
+                name: 'Ma classe',
+                students: parsedLegacy.map((s) => ({ id: s.id || makeId(), ...s })),
+              }];
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Impossible de charger les classes', err);
+        classes = [];
+      }
+      let savedActiveId = null;
+      try { savedActiveId = localStorage.getItem(ACTIVE_CLASS_STORAGE_KEY); } catch (err) {}
+      activeClassId = (savedActiveId && classes.some((c) => c.id === savedActiveId))
+        ? savedActiveId
+        : (classes.length ? classes[0].id : null);
+      syncRosterAlias();
+      saveClasses();
+      populateEleveSelects();
+      renderRosterStatus();
+      renderClassSelector();
+    }
+
+    function createClass(name) {
+      const cls = { id: makeId(), name: (name || '').trim() || `Classe ${classes.length + 1}`, students: [] };
+      classes.push(cls);
+      activeClassId = cls.id;
+      syncRosterAlias();
+      saveClasses();
+      populateEleveSelects();
+      renderRosterStatus();
+      renderRosterManageList();
+      renderClassSelector();
+      return cls;
+    }
+
+    function setActiveClass(id) {
+      if (!classes.some((c) => c.id === id)) return;
+      activeClassId = id;
+      syncRosterAlias();
+      saveClasses();
+      populateEleveSelects();
+      renderRosterStatus();
+      renderRosterManageList();
+      renderClassSelector();
+    }
+
+    function renameActiveClass(name) {
+      const cls = getActiveClass();
+      if (!cls) return;
+      cls.name = (name || '').trim() || cls.name;
+      saveClasses();
+      renderClassSelector();
+      renderRosterStatus();
+    }
+
+    function deleteActiveClass() {
+      const cls = getActiveClass();
+      if (!cls) return;
+      if (!confirm(`Supprimer la classe « ${cls.name} » et ses ${cls.students.length} élève(s) ?`)) return;
+      classes = classes.filter((c) => c.id !== cls.id);
+      activeClassId = classes.length ? classes[0].id : null;
+      syncRosterAlias();
+      saveClasses();
+      populateEleveSelects();
+      renderRosterStatus();
+      renderRosterManageList();
+      renderClassSelector();
+      setStatus('Classe supprimée');
+    }
+
+    function setRosterForActiveClass(students) {
+      const cls = getActiveClass();
+      if (!cls) return;
+      cls.students = students;
+      syncRosterAlias();
+      populateEleveSelects();
+      renderRosterStatus();
+      renderRosterManageList();
+      renderClassSelector();
+      saveClasses();
+    }
+
+    function clearActiveClassStudents() {
+      const cls = getActiveClass();
+      if (!cls) { setStatus('Aucune classe active'); return; }
+      cls.students = [];
+      syncRosterAlias();
+      populateEleveSelects();
+      renderRosterStatus();
+      renderRosterManageList();
+      renderClassSelector();
+      saveClasses();
+      classFile.value = '';
+      setStatus('Élèves de la classe effacés');
+    }
+
+    function addStudent(nom, prenom, cibleRaw) {
+      const n = (nom || '').trim();
+      const p = (prenom || '').trim();
+      if (!n && !p) return;
+      let cls = getActiveClass();
+      if (!cls) cls = createClass('Ma classe');
+      const student = { id: makeId(), nom: n, prenom: p, display: displayName(n, p) };
+      if (targetEnabled) student.cible = parseTargetMeters(cibleRaw);
+      cls.students.push(student);
+      cls.students.sort((a, b) => a.display.localeCompare(b.display, 'fr'));
+      syncRosterAlias();
+      populateEleveSelects();
+      renderRosterStatus();
+      renderRosterManageList();
+      renderClassSelector();
+      saveClasses();
+    }
+
+    function removeStudent(id) {
+      const cls = getActiveClass();
+      if (!cls) return;
+      cls.students = cls.students.filter((s) => s.id !== id);
+      syncRosterAlias();
+      populateEleveSelects();
+      renderRosterStatus();
+      renderRosterManageList();
+      renderClassSelector();
+      saveClasses();
+    }
+
+    function updateStudentTarget(id, rawValue) {
+      const cls = getActiveClass();
+      if (!cls) return;
+      const s = cls.students.find((x) => x.id === id);
+      if (!s) return;
+      s.cible = parseTargetMeters(rawValue);
+      saveClasses();
+      updateTargetHint();
+    }
+
+    function reportImport(students, combinedMode) {
+      if (!students.length) {
+        setStatus('Aucun élève reconnu dans ce fichier');
+        return;
+      }
+      setStatus(combinedMode
+        ? `Classe importée (format "NOM Prénom" détecté dans une seule colonne) : ${students.length} élève(s)`
+        : `Classe importée : ${students.length} élève(s)`);
+    }
+
+    async function handleClassFile(file) {
+      if (!file) return;
+      if (!getActiveClass()) {
+        const defaultName = file.name.replace(/\.[^.]+$/, '') || 'Classe importée';
+        const name = prompt('Nom de la nouvelle classe :', defaultName);
+        createClass(name || defaultName);
+      }
+      const name = file.name.toLowerCase();
+      try {
+        if (name.endsWith('.xlsx')) {
+          if (typeof XLSX === 'undefined') {
+            alert('La lecture des fichiers Excel (.xlsx) nécessite une connexion internet au premier import. Réessaie en étant connecté, ou exporte ta classe Pronote en CSV.');
+            return;
+          }
+          const buffer = await file.arrayBuffer();
+          const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          // raw: false → les dates sont rendues en texte (ex. "12/05/2010") plutôt qu'en numéro de série Excel,
+          // ce qui permet de détecter une colonne B "date de naissance".
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '', raw: false });
+          const { students, combinedMode } = rowsToRoster(rows, { includeTarget: targetEnabled });
+          setRosterForActiveClass(students);
+          reportImport(students, combinedMode);
+        } else {
+          const text = await file.text();
+          const rows = parseDelimitedText(text);
+          const { students, combinedMode } = rowsToRoster(rows, { includeTarget: targetEnabled });
+          setRosterForActiveClass(students);
+          reportImport(students, combinedMode);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Impossible de lire ce fichier. Vérifie que la colonne A contient le Nom et la colonne B le Prénom.');
+      }
+    }
+
+    function fmt(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function clampSeconds(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return 12;
+      return Math.max(MIN_SECONDS, Math.min(MAX_SECONDS, Math.round(n)));
+    }
+
+    function updateSeconds(value, options = {}) {
+      const sec = clampSeconds(value);
+      secondsInput.value = String(sec);
+      if (secondsDisplay) secondsDisplay.textContent = `${sec}s`;
+      presetButtons.forEach((b) => b.classList.toggle('primary', Number(b.dataset.sec) === sec));
+      presetButtons.forEach((b) => b.classList.toggle('secondary', Number(b.dataset.sec) !== sec));
+      if (trackDurationWarn) trackDurationWarn.classList.toggle('hidden', sec < 25);
+      if (options.persist !== false) {
+        try { localStorage.setItem(SECONDS_STORAGE_KEY, String(sec)); } catch (err) {}
+      }
+      if (!countdownTimer) {
+        remaining = sec;
+        renderTime();
+      }
+      return sec;
+    }
+
+    function loadSeconds() {
+      let sec = 12;
+      try {
+        const v = Number(localStorage.getItem(SECONDS_STORAGE_KEY));
+        if (Number.isFinite(v) && v > 0) sec = v;
+      } catch (err) {}
+      updateSeconds(sec, { persist: false });
+    }
+
+    function renderTime() {
+      // Affichage arrondi à la seconde supérieure : "00:01" jusqu'au bip final.
+      timeDisplay.textContent = fmt(Math.max(0, Math.ceil(remaining - 0.001)));
+      if (typeof updateHud === 'function') updateHud();
+    }
+
+    // Le bandeau flottant n'apparaît que lorsqu'une fenêtre (analyse photo, admin, stats) masque
+    // l'écran principal pendant que la bande son ou une course tourne.
+    function updateHud() {
+      const covered = [photoOverlay, adminOverlay, statsOverlay].some((o) => o && !o.classList.contains('hidden'));
+      const active = (typeof trackRunning === 'function' && trackRunning()) || !!countdownTimer;
+      trackHud.classList.toggle('hidden', !(covered && active));
+      if (!covered || !active) return;
+      hudTime.textContent = countdownTimer ? `⏱ ${timeDisplay.textContent}` : '';
+      const cueKind = ['marques', 'prets', 'go'].find((k) => cuePanel.classList.contains(k)) || '';
+      trackHud.classList.remove('marques', 'prets', 'go');
+      if (cueKind && departMode === 'bande') trackHud.classList.add(cueKind);
+      hudCue.textContent = departMode === 'bande' && trackRunning() ? `${cueText.textContent} · ${cueSub.textContent}` : (currentRaceLabel || 'Course');
+    }
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+    }
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function makeSingleBeep(duration = 0.22, frequency = 2600, type = 'square', gainValue = 0.55) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(frequency, now);
+      osc.frequency.linearRampToValueAtTime(frequency + 500, now + duration * 0.45);
+      osc.frequency.linearRampToValueAtTime(frequency - 250, now + duration);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(gainValue, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + duration + 0.02);
+    }
+
+    function strongBeepPattern() {
+      ensureAudio();
+      if (!audioCtx) return;
+      makeSingleBeep(0.18, 2400, 'square', 0.6);
+      makeSingleBeep(0.22, 2850, 'square', 0.65);
+      setTimeout(() => makeSingleBeep(0.26, 3300, 'square', 0.72), 180);
+      setTimeout(() => makeSingleBeep(0.34, 3700, 'sawtooth', 0.78), 420);
+      if (navigator.vibrate) navigator.vibrate([80, 30, 80, 30, 80]);
+    }
+
+    // On se fie à l'état réel de la piste vidéo (readyState), pas juste au fait que la variable
+    // `stream` existe encore : si le système coupe la caméra (appli mise en arrière-plan, autre
+    // appli qui la reprend, etc.), `stream` peut rester non-nul alors que la caméra est en fait
+    // arrêtée — ce qui empêchait le bouton "Autoriser / démarrer la caméra" de réapparaître.
+    function isCameraLive() {
+      return !!stream && stream.getVideoTracks().some((t) => t.readyState === 'live');
+    }
+
+    function syncCameraAdminUI() {
+      const active = isCameraLive();
+      btnCameraToggle.textContent = active ? '📷 Désactiver la caméra' : '📷 Activer la caméra';
+      btnCameraToggle.classList.toggle('primary', !active);
+      btnCameraToggle.classList.toggle('danger', active);
+      cameraAdminNote.textContent = active ? 'Caméra active — prête pour les prises de vue.' : 'Caméra inactive.';
+    }
+
+    // Appelé à l'ouverture de l'Admin (et peut l'être ailleurs) : détecte une caméra coupée
+    // sans qu'on l'ait explicitement arrêtée, remet l'état à jour, puis synchronise le bouton.
+    function refreshCameraState() {
+      if (stream && !isCameraLive()) {
+        stream = null;
+        video.srcObject = null;
+      }
+      syncCameraAdminUI();
+    }
+
+    // `silent` : pas d'alerte bloquante ni de message d'erreur intrusif — utilisé pour la
+    // relance automatique en pleine série de prises (voir ensureCameraReady ci-dessous).
+    async function startCamera(options = {}) {
+      const { silent = false } = options;
+      stopCamera();
+      try {
+        if (!silent) setStatus('Demande d’autorisation caméra...');
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode: { exact: 'environment' } },
+            audio: false
+          });
+        } catch {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode: { ideal: 'environment' } },
+            audio: false
+          });
+        }
+        video.srcObject = stream;
+        await video.play();
+        if (!silent) setStatus('Caméra prête');
+        // Si la piste s'arrête toute seule (caméra reprise par une autre appli, permission
+        // révoquée, matériel débranché...), on réactive automatiquement le bouton en Admin —
+        // et la prochaine capture la relancera d'elle-même (voir ensureCameraReady).
+        stream.getVideoTracks().forEach((track) => {
+          track.addEventListener('ended', () => {
+            if (stream && stream.getVideoTracks().includes(track)) {
+              stream = null;
+              video.srcObject = null;
+              syncCameraAdminUI();
+              setStatus('Caméra interrompue — relance automatique à la prochaine prise');
+            }
+          });
+        });
+      } catch (err) {
+        setStatus('Caméra indisponible');
+        if (!silent) {
+          alert('Impossible d’accéder à la caméra arrière. Vérifie les permissions et utilise HTTPS ou une PWA installée.');
+        }
+        console.error(err);
+      } finally {
+        syncCameraAdminUI();
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      video.srcObject = null;
+      syncCameraAdminUI();
+    }
+
+    // Certains navigateurs suspendent le rendu d'un <video> caché derrière un élément en
+    // position fixed (nos popups Admin / analyse photo occupent tout l'écran) même si le flux
+    // continue en arrière-plan : la piste reste "live" mais l'image affichée se fige sur la
+    // dernière frame rendue — d'où le bug "l'aperçu se fige et la photo suivante reste figée".
+    // On force un redémarrage du rendu en redétachant puis rattachant le flux à l'élément.
+    function wakeVideoPreview() {
+      if (!stream) return;
+      const s = stream;
+      video.srcObject = null;
+      requestAnimationFrame(() => {
+        if (stream !== s) return; // la caméra a changé entre-temps, on n'écrase pas
+        video.srcObject = s;
+        video.play().catch(() => {});
+      });
+    }
+
+    // Garantit une caméra prête juste avant chaque capture, sans intervention manuelle : si
+    // elle s'est coupée entre deux passages (cas fréquent en enchaînant les prises), on la
+    // relance silencieusement ; si elle est restée "live" mais gelée (voir wakeVideoPreview),
+    // on force le redémarrage du rendu avant de déclencher la photo.
+    async function ensureCameraReady() {
+      if (!isCameraLive()) {
+        setStatus('Caméra relancée automatiquement...');
+        await startCamera({ silent: true });
+        if (!isCameraLive()) return false;
+      } else {
+        wakeVideoPreview();
+      }
+      if (video.readyState < 2) {
+        await new Promise((resolve) => {
+          let done = false;
+          const finish = () => {
+            if (done) return;
+            done = true;
+            video.removeEventListener('loadeddata', finish);
+            resolve();
+          };
+          video.addEventListener('loadeddata', finish);
+          setTimeout(finish, 800);
+        });
+      } else {
+        // Laisse une frame au navigateur pour réellement redessiner après le réattachement.
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+      return isCameraLive();
+    }
+
+    // Chemin arrondi réutilisé pour tous les panneaux dessinés sur la photo (infos, cible,
+    // horodatage) afin d'éviter de dupliquer le tracé à chaque fois.
+    function roundRectPath(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function stampPhoto(sourceCanvas, durationSeconds, starter, relayeur, mode, targetMeters) {
+      const out = document.createElement('canvas');
+      out.width = sourceCanvas.width;
+      out.height = sourceCanvas.height;
+      const ctx = out.getContext('2d');
+      ctx.drawImage(sourceCanvas, 0, 0);
+
+      const isIndividuel = mode === 'individuel';
+      const lineCount = isIndividuel ? 2 : 3; // décompte + coureur(s), sans titre
+
+      const pad = Math.max(18, Math.round(out.width * 0.018));
+      const panelW = Math.min(out.width * 0.66, 640);
+      const lineH = Math.max(34, Math.round(out.height * 0.052));
+      const panelH = lineH * lineCount + pad * 1.3;
+      const x = pad;
+      const y = out.height - panelH - pad;
+      const radius = Math.max(18, Math.round(out.width * 0.018));
+      const textSize = Math.max(24, Math.round(out.width * 0.024));
+
+      // Panneau principal (bas-gauche) : décompte + coureur(s), sans titre "Photo Finish".
+      ctx.fillStyle = 'rgba(7, 18, 37, 0.72)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+      ctx.lineWidth = Math.max(2, Math.round(out.width * 0.0025));
+      roundRectPath(ctx, x, y, panelW, panelH, radius);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `700 ${textSize}px system-ui, Arial, sans-serif`;
+      let lineIndex = 0;
+      ctx.fillText(`Décompte : ${durationSeconds}s`, x + pad, y + pad + textSize);
+      if (isIndividuel) {
+        lineIndex += 1;
+        ctx.fillText(`Coureur : ${starter || '—'}`, x + pad, y + pad + textSize + lineH * lineIndex);
+      } else {
+        lineIndex += 1;
+        ctx.fillText(`Démarreur : ${starter || '—'}`, x + pad, y + pad + textSize + lineH * lineIndex);
+        lineIndex += 1;
+        ctx.fillText(`Relayeur : ${relayeur || '—'}`, x + pad, y + pad + textSize + lineH * lineIndex);
+      }
+
+      // Horodatage : petite pastille à droite de la photo, bien séparée du panneau d'infos
+      // ci-dessus pour que les deux ne se mélangent pas ; police réduite.
+      const smallSize = Math.max(15, Math.round(out.width * 0.013));
+      ctx.font = `600 ${smallSize}px system-ui, Arial, sans-serif`;
+      const stampText = new Date().toLocaleString('fr-FR');
+      const stampPadX = Math.max(10, Math.round(out.width * 0.012));
+      const stampPadY = Math.max(7, Math.round(out.width * 0.009));
+      const stampW = ctx.measureText(stampText).width + stampPadX * 2;
+      const stampH = smallSize + stampPadY * 2;
+      const stampX = out.width - pad - stampW;
+      const stampY = out.height - pad - stampH;
+      ctx.fillStyle = 'rgba(7, 18, 37, 0.62)';
+      roundRectPath(ctx, stampX, stampY, stampW, stampH, Math.round(stampH / 2));
+      ctx.fill();
+      ctx.fillStyle = '#d6e7ff';
+      ctx.fillText(stampText, stampX + stampPadX, stampY + stampPadY + smallSize * 0.86);
+
+      // Cible à atteindre : pastille en haut à droite de la photo, si une cible est définie.
+      if (targetMeters !== null && targetMeters !== undefined) {
+        const targetText = `🎯 ${formatTarget(targetMeters)}`;
+        ctx.font = `800 ${textSize}px system-ui, Arial, sans-serif`;
+        const tPadX = Math.max(14, Math.round(out.width * 0.016));
+        const tPadY = Math.max(10, Math.round(out.width * 0.012));
+        const tW = ctx.measureText(targetText).width + tPadX * 2;
+        const tH = textSize + tPadY * 2;
+        const tX = out.width - pad - tW;
+        const tY = pad;
+        ctx.fillStyle = 'rgba(7, 18, 37, 0.72)';
+        ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+        ctx.lineWidth = Math.max(2, Math.round(out.width * 0.0025));
+        roundRectPath(ctx, tX, tY, tW, tH, Math.round(tH / 2));
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(targetText, tX + tPadX, tY + tPadY + textSize * 0.82);
+      }
+
+      return out;
+    }
+
+    // ---- Popup d'analyse de la photo finish : s'ouvre automatiquement après chaque capture,
+    // se ferme manuellement, et se rouvre à tout moment depuis une vignette de la galerie. ----
+
+    function openPhotoAnalysis(index) {
+      const item = galleryItems[index];
+      if (!item) return;
+      currentAttemptIndex = index;
+
+      photo.src = item.url;
+      photo.classList.remove('hidden');
+      downloadLink.href = item.url;
+      downloadLink.download = `photo-finish-sifflet-${String(index + 1).padStart(3, '0')}.jpg`;
+      downloadLink.classList.remove('hidden');
+
+      const who = participantsLabel(item.meta);
+      photoParticipants.textContent = who
+        ? `${item.meta.mode === 'individuel' ? 'Coureur' : 'Passage'} : ${who} — décompte ${item.meta.duration}s`
+        : `Décompte ${item.meta.duration}s`;
+
+      refreshPhotoTargetBadge();
+      renderEcartPanel();
+      photoOverlay.classList.remove('hidden');
+    }
+
+    function refreshPhotoTargetBadge() {
+      const item = galleryItems[currentAttemptIndex];
+      const target = item ? item.meta.targetMeters : null;
+      if (target !== null && target !== undefined) {
+        photoTargetBadge.textContent = `🎯 Cible à atteindre : ${formatTarget(target)}`;
+        photoTargetBadge.classList.remove('hidden');
+      } else {
+        photoTargetBadge.classList.add('hidden');
+      }
+    }
+
+    function closePhotoAnalysis() {
+      photoOverlay.classList.add('hidden');
+      wakeVideoPreview();
+    }
+
+    // « Enregistrer et fermer » : s'assure qu'un écart a bien été choisi avant de fermer,
+    // pour les cas où l'observateur veut compléter la notation avant de passer à autre chose
+    // (l'écart est déjà sauvegardé dès le clic sur un bouton, voir setEcart).
+    function trySaveAndClosePhotoAnalysis() {
+      const hasAttempt = currentAttemptIndex >= 0 && galleryItems[currentAttemptIndex];
+      const noted = hasAttempt && galleryItems[currentAttemptIndex].meta.ecart !== null && galleryItems[currentAttemptIndex].meta.ecart !== undefined;
+      if (!noted) {
+        alert("Choisis d'abord l'écart à la cible, ou utilise « Fermer » pour y revenir plus tard.");
+        return;
+      }
+      closePhotoAnalysis();
+    }
+
+    function renderGallery(options = {}) {
+      galleryGrid.innerHTML = '';
+      galleryItems.forEach((item, index) => {
+        const ecart = item.meta.ecart;
+        const hasEcart = ecart !== null && ecart !== undefined;
+        const kind = hasEcart ? ecartKind(ecart) : 'none';
+        const isIndividuel = item.meta.mode === 'individuel';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'thumb';
+        btn.innerHTML = `
+          <img src="${item.url}" alt="Photo finish ${index + 1}" />
+          <div class="meta">
+            <div><strong>${item.meta.duration}s</strong> — <span class="ecart-tag ${kind}">${ecartLabel(ecart)}</span></div>
+            ${isIndividuel
+              ? `<div>Coureur : ${escapeHtml(item.meta.starter) || '—'}</div>`
+              : `<div>Démarreur : ${escapeHtml(item.meta.starter) || '—'}</div><div>Relayeur : ${escapeHtml(item.meta.relayeur) || '—'}</div>`}
+          </div>
+        `;
+        btn.addEventListener('click', () => openPhotoAnalysis(index));
+        galleryGrid.appendChild(btn);
+      });
+      galleryEmpty.classList.toggle('hidden', galleryItems.length > 0);
+      // L'export CSV ne devient accessible qu'une fois la bibliothèque de photos non vide,
+      // pour éviter toute confusion avant la première capture.
+      btnExportCsv.disabled = galleryItems.length === 0;
+    }
+
+    function saveGallery() {
+      try {
+        localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(galleryItems));
+      } catch (err) {
+        console.warn('Impossible de sauvegarder la galerie', err);
+      }
+    }
+
+    function loadGallery() {
+      try {
+        const raw = localStorage.getItem(GALLERY_STORAGE_KEY);
+        if (!raw) {
+          renderGallery();
+          return;
+        }
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          galleryItems = parsed
+            .filter(item => item && typeof item.url === 'string' && item.meta)
+            .slice(0, MAX_GALLERY_ITEMS)
+            .map(item => ({
+              ...item,
+              meta: {
+                ecart: null,
+                mode: item.meta.relayeur ? 'relais' : 'individuel',
+                ...item.meta,
+              },
+            }));
+        }
+      } catch (err) {
+        console.warn('Impossible de charger la galerie', err);
+        galleryItems = [];
+      }
+      renderGallery();
+    }
+
+    function addToGallery(url, meta) {
+      galleryItems.unshift({ url, meta });
+      galleryItems = galleryItems.slice(0, MAX_GALLERY_ITEMS);
+      renderGallery();
+      saveGallery();
+      refreshStatsLiveView();
+    }
+
+    function clearGallery() {
+      galleryItems = [];
+      currentAttemptIndex = -1;
+      galleryGrid.innerHTML = '';
+      galleryEmpty.classList.remove('hidden');
+      photo.removeAttribute('src');
+      photo.classList.add('hidden');
+      downloadLink.removeAttribute('href');
+      downloadLink.classList.add('hidden');
+      btnExportCsv.disabled = true;
+      closePhotoAnalysis();
+      try {
+        localStorage.removeItem(GALLERY_STORAGE_KEY);
+      } catch (err) {}
+      renderEcartPanel();
+      refreshStatsLiveView();
+      setStatus('Galerie effacée');
+    }
+
+    async function capturePhoto() {
+      if (takingPhoto) return;
+      takingPhoto = true;
+      try {
+        // On vérifie (et on relance si besoin) la caméra juste avant chaque prise : essentiel
+        // pour enchaîner les passages sans que l'observateur ait à s'en soucier.
+        const ready = await ensureCameraReady();
+        if (!ready) {
+          setStatus('Décompte terminé — caméra indisponible, relance-la depuis l’Admin');
+          return;
+        }
+        const w = video.videoWidth || 1280;
+        const h = video.videoHeight || 720;
+        const sourceCanvas = document.createElement('canvas');
+        sourceCanvas.width = w;
+        sourceCanvas.height = h;
+        sourceCanvas.getContext('2d').drawImage(video, 0, 0, w, h);
+
+        const fallback = currentRaceLabel || 'Non renseigné';
+        const starter = getSelectedName(starterSelect, starterManual) || fallback;
+        const relayeur = raceMode === 'individuel' ? '' : (getSelectedName(relayeurSelect, relayeurManual) || fallback);
+        const durationSeconds = currentRaceSeconds || clampSeconds(secondsInput.value);
+
+        // On fige la cible (en mètres) de l'élève au moment de la capture, pour que la popup
+        // d'analyse et la photo elle-même affichent toujours la bonne cible, même si la
+        // sélection change ensuite.
+        let targetMeters = null;
+        if (raceMode === 'individuel' && targetEnabled && starterSelect.value && starterSelect.value !== MANUAL_OPTION) {
+          const student = roster.find((s) => s.display === starterSelect.value);
+          if (student && student.cible !== null && student.cible !== undefined) targetMeters = student.cible;
+        }
+
+        const stampedCanvas = stampPhoto(sourceCanvas, durationSeconds, starter, relayeur, raceMode, targetMeters);
+        const url = stampedCanvas.toDataURL('image/jpeg', 0.92);
+
+        photoIndex += 1;
+        addToGallery(url, { mode: raceMode, duration: durationSeconds, starter, relayeur, ecart: null, targetMeters, createdAt: new Date().toISOString() });
+        openPhotoAnalysis(0);
+      } catch (err) {
+        console.error(err);
+        setStatus('Erreur pendant la capture');
+      } finally {
+        takingPhoto = false;
+      }
+    }
+
+    // ---- Moteur du temps de course ----
+    // Le temps est calculé à partir d'une heure de fin (performance.now) et non en décrémentant
+    // un compteur chaque seconde : pas de dérive, et on peut démarrer "en retard" d'un décalage
+    // précis (cas de la bande son, où le coup de sifflet a eu lieu quelques ms avant le tick).
+    let raceEndAt = 0;
+    let currentRaceLabel = '';
+    let currentRaceSeconds = 0;
+    let ignoreWhistleUntil = 0;
+
+    function stopCountdown() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+      timerBox.classList.remove('running');
+      btnStart.disabled = false;
+      setTimeout(updateHud, 0);
+      btnStop.disabled = true;
+    }
+
+    function resetCountdown() {
+      stopCountdown();
+      remaining = clampSeconds(secondsInput.value);
+      renderTime();
+      setStatus('Décompte remis à zéro');
+    }
+
+    // On ne peut pas démarrer un passage au bouton sans nom de coureur (ou démarreur + relayeur
+    // en relais) : évite les photos finish sans identité exploitable.
+    function validateParticipants() {
+      const starter = getSelectedName(starterSelect, starterManual);
+      if (!starter) {
+        alert(raceMode === 'individuel'
+          ? "Choisis ou saisis le nom du coureur avant de démarrer."
+          : "Choisis ou saisis le nom du démarreur avant de démarrer.");
+        starterSelect.focus();
+        return false;
+      }
+      if (raceMode !== 'individuel') {
+        const relayeur = getSelectedName(relayeurSelect, relayeurManual);
+        if (!relayeur) {
+          alert("Choisis ou saisis le nom du relayeur avant de démarrer.");
+          relayeurSelect.focus();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function hasParticipants() {
+      if (!getSelectedName(starterSelect, starterManual)) return false;
+      if (raceMode !== 'individuel' && !getSelectedName(relayeurSelect, relayeurManual)) return false;
+      return true;
+    }
+
+    // Lance le temps de course. `lateMs` = retard déjà écoulé depuis le vrai coup de sifflet.
+    function startRace(label, lateMs = 0) {
+      ensureAudio();
+      if (countdownTimer) {
+        stopCountdown();
+      }
+      currentRaceSeconds = clampSeconds(secondsInput.value);
+      currentRaceLabel = label || '';
+      raceEndAt = performance.now() + currentRaceSeconds * 1000 - lateMs;
+      remaining = currentRaceSeconds - lateMs / 1000;
+      renderTime();
+      timerBox.classList.add('running');
+      btnStart.disabled = true;
+      btnStop.disabled = false;
+      const who = hasParticipants() ? '' : ' (coureur non choisi)';
+      setStatus(`${label ? label + ' — ' : ''}course en cours…${who}`);
+      requestWakeLock();
+      countdownTimer = setInterval(onRaceTick, 50);
+    }
+
+    async function onRaceTick() {
+      remaining = (raceEndAt - performance.now()) / 1000;
+      renderTime();
+      if (remaining <= 0) {
+        stopCountdown();
+        ignoreWhistleUntil = performance.now() + 2500; // le bip final ne doit pas relancer un départ
+        strongBeepPattern();
+        setStatus('Bip ! Capture photo...');
+        await capturePhoto();
+        if (departMode === 'bande' && currentRaceLabel) setStatus(`📸 ${currentRaceLabel} : photo prise — note l'écart`);
+        currentRaceLabel = '';
+        currentRaceSeconds = 0;
+        remaining = clampSeconds(secondsInput.value);
+        renderTime();
+        if (departMode === 'manuel' && whistleListening) setStatus('🎙️ En attente du prochain coup de sifflet…');
+      }
+    }
+
+    // Bouton "Top départ" : départ immédiat (le prof siffle et appuie, ou un élève appuie).
+    function startCountdown() {
+      if (!validateParticipants()) {
+        setStatus('Nom du coureur manquant — décompte non démarré');
+        return;
+      }
+      startRace('Départ manuel');
+    }
+
+    // ---- Verrou d'écran : évite la mise en veille pendant une séance ----
+    let wakeLock = null;
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator && !wakeLock) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => { wakeLock = null; });
+        }
+      } catch (err) {}
+    }
+
+    // ---- Mode de départ : manuel (sifflet du prof) ou bande son ----
+    let departMode = 'manuel';
+
+    function loadDepartMode() {
+      try {
+        const v = localStorage.getItem(DEPART_MODE_STORAGE_KEY);
+        if (v === 'manuel' || v === 'bande') departMode = v;
+      } catch (err) {}
+      applyDepartMode();
+    }
+
+    function setDepartMode(mode) {
+      if (mode === departMode) return;
+      if (trackRunning() && !confirm('La bande son est en cours. Arrêter la bande son et changer de mode ?')) return;
+      stopTrack();
+      stopWhistleListening();
+      departMode = mode;
+      try { localStorage.setItem(DEPART_MODE_STORAGE_KEY, mode); } catch (err) {}
+      applyDepartMode();
+    }
+
+    function applyDepartMode() {
+      departTabs.forEach((b) => b.classList.toggle('active', b.dataset.depart === departMode));
+      manualPanel.classList.toggle('hidden', departMode !== 'manuel');
+      trackPanel.classList.toggle('hidden', departMode !== 'bande');
+      setStatus(departMode === 'bande' ? 'Bande son prête — 24 départs' : 'Prêt — départs manuels');
+    }
+
+    // ---- Détection du coup de sifflet au micro ----
+    // Un sifflet à bille produit un son très aigu (≈ 2 à 4,5 kHz) et très "pur" : un pic étroit
+    // qui dépasse nettement le reste du spectre. On exige ce pic pendant ~120 ms d'affilée pour
+    // ignorer les claquements, cris ou ballons.
+    let whistleListening = false;
+    let micStream = null;
+    let micSource = null;
+    let micAnalyser = null;
+    let micTimer = null;
+    let micBuf = null;
+    let whistleFrames = 0;
+    const WHISTLE_MIN_HZ = 1800;
+    const WHISTLE_MAX_HZ = 4800;
+    const WHISTLE_MIN_MS = 120;
+
+    function whistleThresholdDb() {
+      const sens = Number(whistleSensitivity.value) || 5;
+      return -20 - sens * 4; // sensibilité 1 → -24 dB ; 5 → -40 dB ; 10 → -60 dB
+    }
+
+    function loadWhistleSensitivity() {
+      try {
+        const v = Number(localStorage.getItem(WHISTLE_SENS_STORAGE_KEY));
+        if (v >= 1 && v <= 10) whistleSensitivity.value = String(v);
+      } catch (err) {}
+      whistleSensitivityLabel.textContent = whistleSensitivity.value;
+      updateMeterMark();
+    }
+
+    function updateMeterMark() {
+      const pct = Math.max(0, Math.min(100, ((whistleThresholdDb() + 80) / 80) * 100));
+      listenMeterMark.style.left = `${pct}%`;
+    }
+
+    async function startWhistleListening() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Ce navigateur ne permet pas d'utiliser le micro. Utilise le bouton « Top départ ».");
+        return;
+      }
+      try {
+        ensureAudio();
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        });
+        micSource = audioCtx.createMediaStreamSource(micStream);
+        micAnalyser = audioCtx.createAnalyser();
+        micAnalyser.fftSize = 2048;
+        micAnalyser.smoothingTimeConstant = 0;
+        micSource.connect(micAnalyser);
+        micBuf = new Float32Array(micAnalyser.frequencyBinCount);
+        whistleFrames = 0;
+        whistleListening = true;
+        btnListen.textContent = '🎙️ À l’écoute du sifflet… (toucher pour arrêter)';
+        btnListen.classList.add('listening');
+        listenMeterWrap.classList.remove('hidden');
+        updateMeterMark();
+        setStatus('🎙️ En attente du coup de sifflet…');
+        requestWakeLock();
+        micTimer = setInterval(analyseWhistle, 30);
+      } catch (err) {
+        console.error(err);
+        alert("Micro inaccessible. Autorise l'accès au micro pour ce site, ou utilise le bouton « Top départ ».");
+        stopWhistleListening();
+      }
+    }
+
+    function stopWhistleListening() {
+      if (micTimer) { clearInterval(micTimer); micTimer = null; }
+      if (micSource) { try { micSource.disconnect(); } catch (err) {} micSource = null; }
+      if (micStream) { micStream.getTracks().forEach((t) => t.stop()); micStream = null; }
+      micAnalyser = null;
+      whistleListening = false;
+      btnListen.textContent = '🎙️ Démarrer au coup de sifflet';
+      btnListen.classList.remove('listening');
+      listenMeterWrap.classList.add('hidden');
+    }
+
+    function analyseWhistle() {
+      if (!micAnalyser) return;
+      micAnalyser.getFloatFrequencyData(micBuf);
+      const binHz = audioCtx.sampleRate / micAnalyser.fftSize;
+      const lo = Math.floor(WHISTLE_MIN_HZ / binHz);
+      const hi = Math.min(micBuf.length - 1, Math.ceil(WHISTLE_MAX_HZ / binHz));
+      let peak = -Infinity;
+      let peakIdx = lo;
+      for (let i = lo; i <= hi; i++) {
+        if (micBuf[i] > peak) { peak = micBuf[i]; peakIdx = i; }
+      }
+      // Niveau "de fond" : médiane du spectre 300 Hz – 8 kHz.
+      const bLo = Math.floor(300 / binHz);
+      const bHi = Math.min(micBuf.length - 1, Math.ceil(8000 / binHz));
+      const band = Array.from(micBuf.slice(bLo, bHi)).sort((a, b) => a - b);
+      const floor = band[Math.floor(band.length / 2)];
+      const prominence = peak - floor;
+
+      const pct = Math.max(0, Math.min(100, ((peak + 80) / 80) * 100));
+      listenMeterBar.style.width = `${pct}%`;
+
+      const now = performance.now();
+      const isWhistle = peak > whistleThresholdDb() && prominence > 30;
+      if (isWhistle) whistleFrames += 1; else whistleFrames = 0;
+
+      if (countdownTimer || now < ignoreWhistleUntil) { whistleFrames = 0; return; }
+      if (whistleFrames * 30 >= WHISTLE_MIN_MS) {
+        whistleFrames = 0;
+        ignoreWhistleUntil = now + 1500;
+        const late = WHISTLE_MIN_MS; // le sifflet a commencé ≈ 120 ms avant la détection
+        startRace('Départ au sifflet', late);
+        if (navigator.vibrate) navigator.vibrate(60);
+      }
+    }
+
+    // ---- Bande son : "À vos marques… Prêts… coup de sifflet", 24 départs, 1 toutes les 30 s ----
+    // Ces temps correspondent exactement au fichier bande-son-sifflet.mp3 fourni avec l'appli.
+    const TRACK = {
+      firstWhistle: 10,   // 1er coup de sifflet à 0:10
+      interval: 30,       // puis toutes les 30 s
+      count: 24,          // 24 départs → dernier à 11:40
+      duration: 720,      // 12 min
+      marquesBefore: 4,   // "À vos marques" 4 s avant le sifflet
+      pretsBefore: 1.8    // "Prêts" 1,8 s avant le sifflet
+    };
+    let trackTimer = null;
+    let firedDeparts = new Set();
+
+    function trackRunning() {
+      return !!trackTimer;
+    }
+
+    function whistleTime(k) {
+      return TRACK.firstWhistle + k * TRACK.interval;
+    }
+
+    async function playTrack() {
+      ensureAudio();
+      try {
+        if (trackAudio.ended || trackAudio.currentTime >= TRACK.duration - 0.5) {
+          trackAudio.currentTime = 0;
+          firedDeparts = new Set();
+        }
+        await trackAudio.play();
+      } catch (err) {
+        console.error(err);
+        alert("Impossible de lire la bande son (bande-son-sifflet.mp3). Vérifie que le fichier est bien à côté de index.html.");
+        return;
+      }
+      // Les départs déjà dépassés (reprise après pause) ne sont pas relancés.
+      for (let k = 0; k < TRACK.count; k++) if (whistleTime(k) < trackAudio.currentTime - 0.3) firedDeparts.add(k);
+      if (!trackTimer) trackTimer = setInterval(onTrackTick, 40);
+      btnTrackPlay.textContent = '⏸️ Pause';
+      btnTrackPlay.classList.remove('success');
+      btnTrackPlay.classList.add('warn');
+      btnTrackStop.disabled = false;
+      requestWakeLock();
+    }
+
+    function pauseTrack() {
+      trackAudio.pause();
+      if (trackTimer) { clearInterval(trackTimer); trackTimer = null; }
+      btnTrackPlay.textContent = '▶️ Reprendre la bande son';
+      btnTrackPlay.classList.add('success');
+      btnTrackPlay.classList.remove('warn');
+      setCue('', 'Pause', 'Bande son en pause');
+    }
+
+    function stopTrack() {
+      trackAudio.pause();
+      try { trackAudio.currentTime = 0; } catch (err) {}
+      if (trackTimer) { clearInterval(trackTimer); trackTimer = null; }
+      firedDeparts = new Set();
+      btnTrackPlay.textContent = '▶️ Lancer la bande son';
+      btnTrackPlay.classList.add('success');
+      btnTrackPlay.classList.remove('warn');
+      btnTrackStop.disabled = true;
+      trackProgressBar.style.width = '0%';
+      setCue('', 'Prêt', `${TRACK.count} départs · 1 toutes les ${TRACK.interval} s · 12 min`);
+    }
+
+    function setCue(kind, text, sub) {
+      cuePanel.classList.remove('marques', 'prets', 'go');
+      if (kind) cuePanel.classList.add(kind);
+      if (cueText.textContent !== text) cueText.textContent = text;
+      if (cueSub.textContent !== sub) cueSub.textContent = sub;
+      updateHud();
+    }
+
+    function onTrackTick() {
+      const t = trackAudio.currentTime;
+      trackProgressBar.style.width = `${Math.min(100, (t / TRACK.duration) * 100)}%`;
+
+      // Déclenchement des départs : dès que la lecture passe l'instant du coup de sifflet.
+      for (let k = 0; k < TRACK.count; k++) {
+        const w = whistleTime(k);
+        if (!firedDeparts.has(k) && t >= w && t < w + 20) {
+          firedDeparts.add(k);
+          startRace(`Départ ${k + 1}/${TRACK.count}`, (t - w) * 1000);
+        }
+      }
+
+      // Affichage des commandements (synchronisé sur la bande son).
+      let next = -1;
+      for (let k = 0; k < TRACK.count; k++) { if (whistleTime(k) + 1.5 > t) { next = k; break; } }
+      if (next === -1) {
+        setCue('', 'Terminé', `${TRACK.count} départs effectués`);
+      } else {
+        const dt = whistleTime(next) - t;
+        const label = `Départ ${next + 1}/${TRACK.count}`;
+        if (dt <= 0) setCue('go', '🔔 PARTEZ !', label);
+        else if (dt <= TRACK.pretsBefore) setCue('prets', 'Prêts…', label);
+        else if (dt <= TRACK.marquesBefore) setCue('marques', 'À vos marques', label);
+        else setCue('', `${Math.ceil(dt)} s`, `avant le ${label.toLowerCase()}`);
+      }
+
+      if (trackAudio.ended || t >= TRACK.duration) {
+        clearInterval(trackTimer);
+        trackTimer = null;
+        btnTrackPlay.textContent = '🔁 Relancer la bande son';
+        btnTrackPlay.classList.add('success');
+        btnTrackPlay.classList.remove('warn');
+        btnTrackStop.disabled = true;
+        setCue('', 'Terminé', `${TRACK.count} départs effectués`);
+      }
+    }
+
+    // ---- Interface Admin (code 0000 par défaut) ----
+
+    function syncAdminLockButtonVisibility() {
+      btnAdminLock.classList.toggle('hidden', !adminUnlocked);
+    }
+
+    function openAdmin() {
+      adminOverlay.classList.remove('hidden');
+      adminPinInput.value = '';
+      adminPinError.classList.add('hidden');
+      syncAdminLockButtonVisibility();
+      if (adminUnlocked) {
+        showAdminContent();
+      } else {
+        adminGate.classList.remove('hidden');
+        adminContent.classList.add('hidden');
+        adminPinInput.focus();
+      }
+    }
+
+    function closeAdmin() {
+      adminOverlay.classList.add('hidden');
+      if (qrScanning) stopQrScan();
+      wakeVideoPreview();
+    }
+
+    function tryUnlockAdmin() {
+      if (adminPinInput.value === ADMIN_CODE) {
+        adminUnlocked = true;
+        adminPinError.classList.add('hidden');
+        showAdminContent();
+      } else {
+        adminPinError.classList.remove('hidden');
+        adminPinInput.value = '';
+        adminPinInput.focus();
+      }
+    }
+
+    function setAdminTab(tab) {
+      adminTabButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
+      adminTabPanels.forEach((panel) => panel.classList.toggle('hidden', panel.dataset.tabPanel !== tab));
+    }
+
+    function showAdminContent() {
+      adminGate.classList.add('hidden');
+      adminContent.classList.remove('hidden');
+      syncAdminLockButtonVisibility();
+      setAdminTab('course');
+      renderRosterManageList();
+      refreshCameraState();
+    }
+
+    function lockAdmin() {
+      adminUnlocked = false;
+      closeAdmin();
+    }
+
+    btnAdmin.addEventListener('click', openAdmin);
+    btnAdminClose.addEventListener('click', closeAdmin);
+    adminOverlay.addEventListener('click', (e) => { if (e.target === adminOverlay) closeAdmin(); });
+    btnAdminUnlock.addEventListener('click', tryUnlockAdmin);
+    adminPinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlockAdmin(); });
+    btnAdminLock.addEventListener('click', lockAdmin);
+    btnStats.addEventListener('click', openStats);
+    btnStatsClose.addEventListener('click', closeStats);
+    btnStatsQrExport.addEventListener('click', exportStatsQr);
+    btnScanQr.addEventListener('click', () => { if (qrScanning) stopQrScan(); else startQrScan(); });
+    statsOverlay.addEventListener('click', (e) => { if (e.target === statsOverlay) closeStats(); });
+    btnPhotoClose.addEventListener('click', closePhotoAnalysis);
+    btnPhotoSaveClose.addEventListener('click', trySaveAndClosePhotoAnalysis);
+    photoOverlay.addEventListener('click', (e) => { if (e.target === photoOverlay) closePhotoAnalysis(); });
+    modeButtons.forEach((btn) => btn.addEventListener('click', () => setRaceMode(btn.dataset.mode)));
+    unitButtons.forEach((btn) => btn.addEventListener('click', () => setEcartUnit(btn.dataset.unit)));
+    adminTabButtons.forEach((btn) => btn.addEventListener('click', () => setAdminTab(btn.dataset.tab)));
+    targetEnabledCheckbox.addEventListener('change', () => setTargetEnabled(targetEnabledCheckbox.checked));
+    btnAddStudent.addEventListener('click', () => {
+      addStudent(addNom.value, addPrenom.value, addCible.value);
+      addNom.value = '';
+      addPrenom.value = '';
+      addCible.value = '';
+      addNom.focus();
+    });
+
+    btnMinus.addEventListener('click', () => updateSeconds(Number(secondsInput.value || 12) - 1));
+    btnPlus.addEventListener('click', () => updateSeconds(Number(secondsInput.value || 12) + 1));
+    btnCameraToggle.addEventListener('click', () => {
+      if (isCameraLive()) stopCamera();
+      else startCamera();
+    });
+    btnStart.addEventListener('click', startCountdown);
+    btnStop.addEventListener('click', () => {
+      stopCountdown();
+      setStatus('Course annulée (pas de photo)');
+      currentRaceLabel = '';
+      currentRaceSeconds = 0;
+      remaining = clampSeconds(secondsInput.value);
+      renderTime();
+    });
+    departTabs.forEach((b) => b.addEventListener('click', () => setDepartMode(b.dataset.depart)));
+    presetButtons.forEach((b) => b.addEventListener('click', () => updateSeconds(Number(b.dataset.sec))));
+    btnListen.addEventListener('click', () => { if (whistleListening) { stopWhistleListening(); setStatus('Détection du sifflet arrêtée'); } else startWhistleListening(); });
+    whistleSensitivity.addEventListener('input', () => {
+      whistleSensitivityLabel.textContent = whistleSensitivity.value;
+      try { localStorage.setItem(WHISTLE_SENS_STORAGE_KEY, whistleSensitivity.value); } catch (err) {}
+      updateMeterMark();
+    });
+    btnTrackPlay.addEventListener('click', () => { if (trackRunning()) pauseTrack(); else playTrack(); });
+    btnTrackStop.addEventListener('click', () => {
+      if (!confirm('Arrêter la bande son et revenir au début ?')) return;
+      stopTrack();
+      setStatus('Bande son arrêtée');
+    });
+    btnReset.addEventListener('click', resetCountdown);
+    btnClearGallery.addEventListener('click', clearGallery);
+    btnExportCsv.addEventListener('click', exportCsv);
+    classFile.addEventListener('change', (e) => handleClassFile(e.target.files && e.target.files[0]));
+    btnClearRoster.addEventListener('click', clearActiveClassStudents);
+    classSelect.addEventListener('change', () => setActiveClass(classSelect.value));
+    btnCreateClass.addEventListener('click', () => {
+      const name = newClassName.value.trim();
+      if (!name) { alert('Indique un nom de classe.'); return; }
+      createClass(name);
+      newClassName.value = '';
+    });
+    btnRenameClass.addEventListener('click', () => {
+      const cls = getActiveClass();
+      if (!cls) { alert('Aucune classe active.'); return; }
+      const name = prompt('Nouveau nom de la classe :', cls.name);
+      if (name && name.trim()) renameActiveClass(name.trim());
+    });
+    btnDeleteClass.addEventListener('click', deleteActiveClass);
+    btnTargetInfo.addEventListener('click', () => targetExplainNote.classList.toggle('hidden'));
+    starterSelect.addEventListener('change', () => { syncManualVisibility(starterSelect, starterManual); updateTargetHint(); });
+    relayeurSelect.addEventListener('change', () => syncManualVisibility(relayeurSelect, relayeurManual));
+    window.addEventListener('beforeunload', stopCamera);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if ((trackRunning() || whistleListening || countdownTimer) && !wakeLock) requestWakeLock();
+        refreshCameraState();
+        wakeVideoPreview();
+      }
+    });
+
+    loadSeconds();
+    loadWhistleSensitivity();
+    loadDepartMode();
+    buildEcartButtons();
+    loadRaceMode();
+    loadTargetSetting();
+    loadEcartUnit();
+    loadGallery();
+    renderEcartPanel();
+    loadClasses();
+    loadImportedStats();
+    refreshCameraState();
+    const versionTag = $('versionTag');
+    if (versionTag) versionTag.textContent = `v${APP_VERSION}`;
+
+    // ---- Installation et mise à jour de la PWA ----
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      btnInstall.classList.remove('hidden');
+    });
+    btnInstall.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      btnInstall.disabled = true;
+      deferredInstallPrompt.prompt();
+      try { await deferredInstallPrompt.userChoice; } catch (err) {}
+      deferredInstallPrompt = null;
+      btnInstall.classList.add('hidden');
+      btnInstall.disabled = false;
+    });
+    window.addEventListener('appinstalled', () => {
+      btnInstall.classList.add('hidden');
+      deferredInstallPrompt = null;
+      setStatus('Application installée');
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((registration) => {
+          // Un Service Worker déjà en attente (mise à jour téléchargée lors d'une visite précédente) :
+          // on propose tout de suite d'actualiser.
+          if (registration.waiting) showUpdateBanner(registration);
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (!newWorker) return;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                showUpdateBanner(registration);
+              }
+            });
+          });
+        }).catch(console.error);
+      });
+
+      // Dès que le nouveau Service Worker prend le contrôle, on recharge une seule fois
+      // pour garantir que la page affichée corresponde bien à la version installée.
+      let refreshingAfterUpdate = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshingAfterUpdate) return;
+        refreshingAfterUpdate = true;
+        window.location.reload();
+      });
+    }
+
+    function showUpdateBanner(registration) {
+      updateBanner.classList.remove('hidden');
+      btnUpdateReload.onclick = () => {
+        if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      };
+    }
+  </script>
+</body>
+</html>
