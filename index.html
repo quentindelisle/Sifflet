@@ -943,7 +943,7 @@
     const hudTime = $('hudTime');
     const MANUAL_OPTION = '__manual__';
     const ADMIN_CODE = '0000';
-    const APP_VERSION = '2.1.0';
+    const APP_VERSION = '2.1.1';
 
     let stream = null;
     let countdownTimer = null;
@@ -2680,8 +2680,8 @@
       interval: 30,       // puis toutes les 30 s
       count: 24,          // 24 départs → dernier à 11:40
       duration: 720,      // 12 min
-      marquesBefore: 4,   // "À vos marques" 4 s avant le sifflet
-      pretsBefore: 1.8    // "Prêts" 1,8 s avant le sifflet
+      marquesBefore: 3.2, // "À vos marques" 3,2 s avant le sifflet
+      pretsBefore: 1.3    // "Prêts" 1,3 s avant le sifflet
     };
     let trackTimer = null;
     let firedDeparts = new Set();
