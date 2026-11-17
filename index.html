@@ -943,7 +943,7 @@
     const hudTime = $('hudTime');
     const MANUAL_OPTION = '__manual__';
     const ADMIN_CODE = '0000';
-    const APP_VERSION = '2.1.1';
+    const APP_VERSION = '2.2.0';
 
     let stream = null;
     let countdownTimer = null;
@@ -2675,13 +2675,16 @@
 
     // ---- Bande son : "À vos marques… Prêts… coup de sifflet", 24 départs, 1 toutes les 30 s ----
     // Ces temps correspondent exactement au fichier bande-son-sifflet.mp3 fourni avec l'appli.
+    // Ces temps correspondent exactement au fichier bande-son-sifflet.mp3 fourni avec l'appli :
+    // "À vos marques" toutes les 30 s, "Prêts" 1 s après, puis coup de sifflet après un silence
+    // VARIABLE de 1 à 2 s (tiré au hasard pour chaque départ) afin que les élèves n'anticipent pas.
     const TRACK = {
-      firstWhistle: 10,   // 1er coup de sifflet à 0:10
-      interval: 30,       // puis toutes les 30 s
-      count: 24,          // 24 départs → dernier à 11:40
-      duration: 720,      // 12 min
-      marquesBefore: 3.2, // "À vos marques" 3,2 s avant le sifflet
-      pretsBefore: 1.3    // "Prêts" 1,3 s avant le sifflet
+      count: 24,
+      interval: 30,
+      duration: 720, // 12 min
+      marques: [6, 36, 66, 96, 126, 156, 186, 216, 246, 276, 306, 336, 366, 396, 426, 456, 486, 516, 546, 576, 606, 636, 666, 696],
+      prets: [7.0, 37.0, 67.0, 97.0, 127.0, 157.0, 187.0, 217.0, 247.0, 277.0, 307.0, 337.0, 367.0, 397.0, 427.0, 457.0, 487.0, 517.0, 547.0, 577.0, 607.0, 637.0, 667.0, 697.0],
+      whistles: [8.43, 38.89, 68.72, 98.62, 128.6, 159.04, 189.16, 218.43, 248.9, 278.55, 309.22, 339.17, 368.89, 399.0, 428.77, 459.08, 488.7, 518.59, 548.53, 578.48, 608.78, 638.68, 668.91, 698.26]
     };
     let trackTimer = null;
     let firedDeparts = new Set();
@@ -2691,7 +2694,7 @@
     }
 
     function whistleTime(k) {
-      return TRACK.firstWhistle + k * TRACK.interval;
+      return TRACK.whistles[k];
     }
 
     async function playTrack() {
@@ -2754,7 +2757,7 @@
       // Déclenchement des départs : dès que la lecture passe l'instant du coup de sifflet.
       for (let k = 0; k < TRACK.count; k++) {
         const w = whistleTime(k);
-        if (!firedDeparts.has(k) && t >= w && t < w + 20) {
+        if (!firedDeparts.has(k) && t >= w && t < w + 15) {
           firedDeparts.add(k);
           startRace(`Départ ${k + 1}/${TRACK.count}`, (t - w) * 1000);
         }
@@ -2766,12 +2769,13 @@
       if (next === -1) {
         setCue('', 'Terminé', `${TRACK.count} départs effectués`);
       } else {
-        const dt = whistleTime(next) - t;
+        // Avant "À vos marques" on affiche un compte à rebours ; ensuite plus aucun chiffre,
+        // pour que l'écran ne trahisse pas le moment (variable) du coup de sifflet.
         const label = `Départ ${next + 1}/${TRACK.count}`;
-        if (dt <= 0) setCue('go', '🔔 PARTEZ !', label);
-        else if (dt <= TRACK.pretsBefore) setCue('prets', 'Prêts…', label);
-        else if (dt <= TRACK.marquesBefore) setCue('marques', 'À vos marques', label);
-        else setCue('', `${Math.ceil(dt)} s`, `avant le ${label.toLowerCase()}`);
+        if (t >= whistleTime(next)) setCue('go', '🔔 PARTEZ !', label);
+        else if (t >= TRACK.prets[next]) setCue('prets', 'Prêts…', label);
+        else if (t >= TRACK.marques[next]) setCue('marques', 'À vos marques', label);
+        else setCue('', `${Math.ceil(TRACK.marques[next] - t)} s`, `avant « À vos marques » · ${label.toLowerCase()}`);
       }
 
       if (trackAudio.ended || t >= TRACK.duration) {

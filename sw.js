@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sifflet-v3';
+const CACHE_NAME = 'sifflet-v4';
 const ASSETS = [
   './', './index.html', './manifest.json', './sw.js', './icon-square.png', './icon-192.png', './icon-512.png',
   './bande-son-sifflet.mp3'
