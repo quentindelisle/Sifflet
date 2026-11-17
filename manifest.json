@@ -13,7 +13,7 @@
   "background_color": "#0b1836",
   "theme_color": "#0b1836",
   "lang": "fr",
-  "orientation": "portrait",
+  "orientation": "landscape",
   "icons": [
     {
       "src": "./icon-192.png",

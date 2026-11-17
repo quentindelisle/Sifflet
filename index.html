@@ -70,8 +70,8 @@
       grid-template-columns: 1fr;
       gap: 16px;
     }
-    @media (min-width: 960px) {
-      .grid { grid-template-columns: 390px 1fr; }
+    @media (min-width: 960px), (orientation: landscape) and (min-width: 640px) {
+      .grid { grid-template-columns: minmax(300px, 380px) 1fr; align-items: start; }
     }
     .card {
       background: var(--card);
@@ -447,7 +447,7 @@
     #manualPanel > .row + .row, #manualPanel > div + .row { margin-top: 0; }
     #trackPanel .cue-panel { margin-top: 0; }
     .depart-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; border-radius: 16px; background: rgba(255,255,255,.06); border: 1px solid var(--card-border); margin-bottom: 14px; }
-    .depart-tab { min-height: 46px; background: transparent; box-shadow: none; color: var(--muted); font-size: .95rem; }
+    .depart-tab { min-height: 42px; background: transparent; box-shadow: none; color: var(--muted); font-size: .95rem; }
     .depart-tab.active { background: linear-gradient(135deg, #1d63ff, #5ba1ff); color: #fff; box-shadow: 0 8px 16px rgba(46,121,255,.3); }
     .cue-panel { margin-top: 14px; border-radius: 18px; padding: 14px; text-align: center; background: rgba(255,255,255,.05); border: 1px solid var(--card-border); transition: background .2s ease, border-color .2s ease; }
     .cue-text { font-size: clamp(1.6rem, 6vw, 2.6rem); font-weight: 900; line-height: 1.1; min-height: 1.2em; }
@@ -466,6 +466,42 @@
     .preset-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
     .preset-row button { min-height: 38px; padding: 6px 14px; font-size: .9rem; }
     input[type="range"] { width: 100%; accent-color: #5ba1ff; }
+    .setup-step { margin-bottom: 12px; }
+    .step-title { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: .95rem; margin-bottom: 6px; color: var(--muted); }
+    .step-num { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; background: #1d63ff; color: #fff; font-size: .8rem; }
+    .step-note { margin: 4px 0 0; font-size: .85rem; }
+    .setup-step .depart-tabs { margin-bottom: 0; }
+    .thumb .todo { color: #fbbf24; font-weight: 800; }
+    /* Invitation à passer en paysage */
+    .rotate-overlay { display: none; }
+    @media (orientation: portrait) and (max-width: 1100px) {
+      body:not(.portrait-ok) .rotate-overlay { display: grid; place-items: center; position: fixed; inset: 0; z-index: 200; background: rgba(7,18,37,.97); padding: 24px; text-align: center; }
+    }
+    .rotate-box { max-width: 420px; }
+    /* Paysage sur tablette / téléphone : tout le premier écran doit tenir sans défiler */
+    @media (orientation: landscape) and (max-height: 900px) {
+      .app { padding-top: 8px; }
+      .header { margin-bottom: 8px; }
+      .brand img.logo { width: 54px; height: 54px; border-radius: 14px; }
+      .brand-text h1 { font-size: 1.6rem; }
+      .brand-text .subtitle { margin-top: 2px; font-size: .85rem; }
+      .top-actions button { min-height: 40px; padding: 8px 14px; }
+      .card { padding: 12px; }
+      .setup-step { margin-bottom: 8px; }
+      .step-title { margin-bottom: 4px; }
+      button, a.dl { min-height: 42px; padding-top: 8px; padding-bottom: 8px; }
+      .depart-tab { min-height: 36px; }
+      #manualPanel, #trackPanel { gap: 8px; margin: 8px 0; }
+      .cue-panel { padding: 8px 10px; }
+      .cue-text { font-size: 1.8rem; }
+      .timer { margin-top: 8px; padding: 8px; }
+      .time { font-size: 3rem; }
+      .status { margin-top: 4px; font-size: .9rem; }
+      .card h2 { margin-bottom: 8px; }
+    }
+    .rotate-box h2 { margin: 12px 0 8px; }
+    .rotate-icon { font-size: 4rem; display: inline-block; animation: rotateHint 2.2s ease-in-out infinite; }
+    @keyframes rotateHint { 0%, 25% { transform: rotate(0deg); } 55%, 80% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
     /* Bandeau toujours visible (même par-dessus l'analyse photo) pendant la bande son */
     .track-hud { position: fixed; top: max(8px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 100; display: flex; gap: 14px; align-items: center; padding: 8px 18px; border-radius: 99px; background: rgba(7,18,37,.92); border: 1px solid rgba(255,255,255,.25); box-shadow: 0 10px 24px rgba(0,0,0,.4); font-weight: 900; font-size: 1.05rem; white-space: nowrap; pointer-events: none; }
     .track-hud.marques { border-color: #f2c94c; color: #f2c94c; }
@@ -497,25 +533,25 @@
 
     <div class="grid">
       <section class="card">
-        <div class="depart-tabs" role="tablist" aria-label="Gestion des départs">
-          <button type="button" class="depart-tab" data-depart="manuel">🙋 Départs manuels</button>
-          <button type="button" class="depart-tab" data-depart="bande">🔊 Bande son</button>
+        <div class="setup-step">
+          <div class="step-title"><span class="step-num">1</span> Caméra</div>
+          <button id="btnCameraToggle" class="primary full" type="button">📷 Activer la caméra</button>
+          <p id="cameraAdminNote" class="note step-note">Caméra inactive.</p>
         </div>
 
-        <div class="row">
-          <div class="field">
-            <label id="starterLabel" for="starterSelect">Démarreur</label>
-            <select id="starterSelect"><option value="">— Choisir dans la classe —</option></select>
-            <input id="starterManual" type="text" placeholder="Prénom (saisie manuelle)" autocomplete="off" class="hidden" style="margin-top:8px;" />
-            <p id="targetHint" class="target-badge hidden"></p>
+        <div class="setup-step">
+          <div class="step-title"><span class="step-num">2</span> Mode de course</div>
+          <div class="depart-tabs" role="tablist" aria-label="Mode de course">
+            <button type="button" class="depart-tab mode-btn" data-mode="relais">🔁 Relais</button>
+            <button type="button" class="depart-tab mode-btn" data-mode="individuel">🙋 Individuel</button>
           </div>
         </div>
 
-        <div class="row" id="relayeurRow">
-          <div class="field">
-            <label for="relayeurSelect">Relayeur</label>
-            <select id="relayeurSelect"><option value="">— Choisir dans la classe —</option></select>
-            <input id="relayeurManual" type="text" placeholder="Prénom (saisie manuelle)" autocomplete="off" class="hidden" style="margin-top:8px;" />
+        <div class="setup-step">
+          <div class="step-title"><span class="step-num">3</span> Départs</div>
+          <div class="depart-tabs" role="tablist" aria-label="Gestion des départs">
+            <button type="button" class="depart-tab depart-choice" data-depart="manuel">🎙️ Au coup de sifflet</button>
+            <button type="button" class="depart-tab depart-choice" data-depart="bande">🔊 Bande son</button>
           </div>
         </div>
 
@@ -526,7 +562,7 @@
             <div class="listen-meter" title="Niveau du sifflet capté"><div id="listenMeterBar"></div><span id="listenMeterMark"></span></div>
             <p id="listenNote" class="note" style="margin:6px 0 0;">Micro actif : siffle pour lancer le temps de course.</p>
           </div>
-          <div class="row"><button id="btnStart" class="success full" type="button">▶️ Top départ (bouton)</button></div>
+          <div class="row"><button id="btnStart" class="success full" type="button">▶️ Top départ (sans sifflet)</button></div>
         </div>
 
         <!-- Mode 2 : départs pilotés par la bande son -->
@@ -543,8 +579,10 @@
           <audio id="trackAudio" src="bande-son-sifflet.mp3" preload="auto"></audio>
         </div>
 
-        <div class="row"><button id="btnStop" class="danger full" type="button" disabled>⏹️ Annuler la course en cours</button></div>
-        <div class="row"><button id="btnReset" class="warn full" type="button">🔄 Remettre à zéro</button></div>
+        <div class="row">
+          <button id="btnStop" class="danger" type="button" style="flex:1;" disabled>⏹️ Annuler la course</button>
+          <button id="btnReset" class="warn" type="button" style="flex:1;">🔄 Remettre à zéro</button>
+        </div>
 
         <div class="timer" id="timerBox">
           <div>
@@ -562,6 +600,7 @@
 
         <div class="gallery">
           <h2>🖼️ Galerie des photos finish</h2>
+          <p class="note" style="margin-top:-8px;">Touche une photo pour nommer le(s) coureur(s) et noter l'écart, après la séance si besoin.</p>
           <div id="galleryGrid" class="thumb-grid"></div>
           <p id="galleryEmpty" class="note">Aucune photo pour le moment.</p>
           <div class="row" style="margin-top:14px;">
@@ -584,7 +623,27 @@
           <a id="downloadLink" class="dl full hidden" download="photo-finish-sifflet.jpg">⬇️ Télécharger cette photo</a>
         </div>
         <div class="photo-analysis-right">
-          <h2 id="ecartPanelTitle" style="margin-top:0;">🎯 Écart à la cible</h2>
+          <h2 style="margin-top:0;">🏃 Coureur(s)</h2>
+          <div class="row">
+            <div class="field">
+              <label id="starterLabel" for="starterSelect">Démarreur</label>
+              <select id="starterSelect"><option value="">— Choisir dans la classe —</option></select>
+              <input id="starterManual" type="text" placeholder="Prénom (saisie manuelle)" autocomplete="off" class="hidden" style="margin-top:8px;" />
+            </div>
+          </div>
+          <div class="row" id="relayeurRow">
+            <div class="field">
+              <label for="relayeurSelect">Relayeur</label>
+              <select id="relayeurSelect"><option value="">— Choisir dans la classe —</option></select>
+              <input id="relayeurManual" type="text" placeholder="Prénom (saisie manuelle)" autocomplete="off" class="hidden" style="margin-top:8px;" />
+            </div>
+          </div>
+          <p id="targetHint" class="target-badge hidden"></p>
+          <div class="row" style="margin-top:10px;">
+            <button id="btnPrevPhoto" class="secondary" type="button" style="flex:1;">◀️ Photo précédente</button>
+            <button id="btnNextPhoto" class="secondary" type="button" style="flex:1;">Photo suivante ▶️</button>
+          </div>
+          <h2 id="ecartPanelTitle" style="margin-top:18px;">🎯 Écart à la cible</h2>
           <p id="ecartHint" class="note"></p>
           <div id="ecartButtons" class="ecart-buttons-grid"></div>
         </div>
@@ -620,10 +679,6 @@
 
       <div id="adminContent" class="hidden" style="margin-top:12px;">
         <div class="row">
-          <button id="btnCameraToggle" class="primary full" type="button">📷 Activer la caméra</button>
-        </div>
-        <p id="cameraAdminNote" class="note">Caméra inactive.</p>
-        <div class="row">
           <button id="btnScanQr" class="secondary full" type="button">📷 Scanner un QR code (résultats d'un autre appareil)</button>
         </div>
 
@@ -634,13 +689,7 @@
         </div>
 
         <div class="admin-tab-panel" data-tab-panel="course">
-          <h2 style="margin-top:0;">⚙️ Mode de course</h2>
-          <div class="row">
-            <button type="button" class="secondary mode-btn full" data-mode="relais" style="flex:1;">🔁 Relais (démarreur + relayeur)</button>
-            <button type="button" class="secondary mode-btn full" data-mode="individuel" style="flex:1;">🙋 Individuel (coureur seul)</button>
-          </div>
-
-          <h2 style="margin-top:20px;">⏱️ Temps de course</h2>
+          <h2 style="margin-top:0;">⏱️ Temps de course</h2>
           <p class="note" style="margin-top:-6px;">Durée du timer entre le coup de sifflet et la photo finish.</p>
           <div class="stepper-row">
             <button id="btnMinus" class="danger stepper-btn" type="button">−</button>
@@ -766,6 +815,15 @@
     </div>
   </div>
 
+  <div id="rotateOverlay" class="rotate-overlay">
+    <div class="rotate-box">
+      <div class="rotate-icon">📱↻</div>
+      <h2>Tourne l'écran en mode paysage</h2>
+      <p class="note">Sifflet est conçu pour une tablette ou un téléphone tenu à l'horizontale : caméra, chrono et galerie côte à côte.</p>
+      <button id="btnRotateDismiss" class="secondary" type="button">Continuer en portrait</button>
+    </div>
+  </div>
+
   <div id="trackHud" class="track-hud hidden"><span id="hudCue"></span><span id="hudTime" class="hud-time"></span></div>
 
   <div class="signature">by Quentin Delisle</div>
@@ -857,7 +915,10 @@
     const statsResultsWrap = $('statsResultsWrap');
     const ecartPanelTitle = $('ecartPanelTitle');
     const unitButtons = Array.from(document.querySelectorAll('.unit-btn'));
-    const departTabs = Array.from(document.querySelectorAll('.depart-tab'));
+    const departTabs = Array.from(document.querySelectorAll('.depart-choice'));
+    const btnPrevPhoto = $('btnPrevPhoto');
+    const btnNextPhoto = $('btnNextPhoto');
+    const btnRotateDismiss = $('btnRotateDismiss');
     const presetButtons = Array.from(document.querySelectorAll('.preset-btn'));
     const manualPanel = $('manualPanel');
     const trackPanel = $('trackPanel');
@@ -882,7 +943,7 @@
     const hudTime = $('hudTime');
     const MANUAL_OPTION = '__manual__';
     const ADMIN_CODE = '0000';
-    const APP_VERSION = '2.0.0';
+    const APP_VERSION = '2.1.0';
 
     let stream = null;
     let countdownTimer = null;
@@ -936,11 +997,7 @@
     }
 
     function applyRaceMode() {
-      const isIndividuel = raceMode === 'individuel';
-      relayeurRow.classList.toggle('hidden', isIndividuel);
-      starterLabel.textContent = isIndividuel ? 'Coureur' : 'Démarreur';
       modeButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.mode === raceMode));
-      updateTargetHint();
     }
 
     // ---- Cible individuelle (mètres) par élève ----
@@ -981,19 +1038,9 @@
       return `${formatMeters(n)} ${ecartUnitLabel()}`;
     }
 
+    // La cible s'affiche désormais dans la fiche de la photo (voir refreshPhotoTargetBadge).
     function updateTargetHint() {
-      const isIndividuel = raceMode === 'individuel';
-      if (!isIndividuel || !targetEnabled || starterSelect.value === MANUAL_OPTION || !starterSelect.value) {
-        targetHint.classList.add('hidden');
-        return;
-      }
-      const student = roster.find((s) => s.display === starterSelect.value);
-      if (!student || student.cible === null || student.cible === undefined) {
-        targetHint.classList.add('hidden');
-        return;
-      }
-      targetHint.textContent = `🎯 Cible : ${formatTarget(student.cible)}`;
-      targetHint.classList.remove('hidden');
+      if (typeof refreshPhotoTargetBadge === 'function' && currentAttemptIndex >= 0) refreshPhotoTargetBadge();
     }
 
     // ---- Unité de l'écart à la cible : plots ou mètres (réglable en Admin) ----
@@ -1122,7 +1169,7 @@
         alert('Aucune tentative à exporter pour le moment.');
         return;
       }
-      const header = ['Date', 'Heure', 'Mode', 'Coureur(s)', 'Décompte (s)', `Écart (${ecartUnitLabel()})`, 'Résultat'];
+      const header = ['Date', 'Heure', 'Départ', 'Mode', 'Coureur(s)', 'Temps de course (s)', `Écart (${ecartUnitLabel()})`, 'Résultat'];
       const rows = galleryItems
         .slice()
         .reverse() // ordre chronologique dans l'export
@@ -1135,6 +1182,7 @@
           return [
             dateStr,
             timeStr,
+            item.meta.label || '',
             item.meta.mode === 'individuel' ? 'Individuel' : 'Relais',
             participantsLabel(item.meta),
             item.meta.duration != null ? item.meta.duration : '',
@@ -2029,15 +2077,14 @@
       ctx.closePath();
     }
 
-    function stampPhoto(sourceCanvas, durationSeconds, starter, relayeur, mode, targetMeters) {
+    function stampPhoto(sourceCanvas, durationSeconds, label) {
       const out = document.createElement('canvas');
       out.width = sourceCanvas.width;
       out.height = sourceCanvas.height;
       const ctx = out.getContext('2d');
       ctx.drawImage(sourceCanvas, 0, 0);
 
-      const isIndividuel = mode === 'individuel';
-      const lineCount = isIndividuel ? 2 : 3; // décompte + coureur(s), sans titre
+      const lineCount = label ? 2 : 1; // temps de course + n° de départ (les noms sont ajoutés plus tard)
 
       const pad = Math.max(18, Math.round(out.width * 0.018));
       const panelW = Math.min(out.width * 0.66, 640);
@@ -2059,15 +2106,10 @@
       ctx.fillStyle = '#ffffff';
       ctx.font = `700 ${textSize}px system-ui, Arial, sans-serif`;
       let lineIndex = 0;
-      ctx.fillText(`Décompte : ${durationSeconds}s`, x + pad, y + pad + textSize);
-      if (isIndividuel) {
+      ctx.fillText(`Temps de course : ${durationSeconds}s`, x + pad, y + pad + textSize);
+      if (label) {
         lineIndex += 1;
-        ctx.fillText(`Coureur : ${starter || '—'}`, x + pad, y + pad + textSize + lineH * lineIndex);
-      } else {
-        lineIndex += 1;
-        ctx.fillText(`Démarreur : ${starter || '—'}`, x + pad, y + pad + textSize + lineH * lineIndex);
-        lineIndex += 1;
-        ctx.fillText(`Relayeur : ${relayeur || '—'}`, x + pad, y + pad + textSize + lineH * lineIndex);
+        ctx.fillText(label, x + pad, y + pad + textSize + lineH * lineIndex);
       }
 
       // Horodatage : petite pastille à droite de la photo, bien séparée du panneau d'infos
@@ -2087,6 +2129,47 @@
       ctx.fillStyle = '#d6e7ff';
       ctx.fillText(stampText, stampX + stampPadX, stampY + stampPadY + smallSize * 0.86);
 
+      return out;
+    }
+
+    // Photo téléchargée = photo finish + noms des coureurs et cible (ajoutés depuis la galerie).
+    function composeDownload(item) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const out = document.createElement('canvas');
+          out.width = img.naturalWidth;
+          out.height = img.naturalHeight;
+          const ctx = out.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const m = item.meta;
+          const lines = m.mode === 'individuel'
+            ? (m.starter ? [`Coureur : ${m.starter}`] : [])
+            : [m.starter ? `Démarreur : ${m.starter}` : '', m.relayeur ? `Relayeur : ${m.relayeur}` : ''].filter(Boolean);
+          const pad = Math.max(18, Math.round(out.width * 0.018));
+          const textSize = Math.max(24, Math.round(out.width * 0.024));
+          const lineH = Math.max(34, Math.round(out.height * 0.052));
+          ctx.font = `700 ${textSize}px system-ui, Arial, sans-serif`;
+          if (lines.length) {
+            const w = Math.max(...lines.map((l) => ctx.measureText(l).width)) + pad * 2;
+            const h = lineH * lines.length + pad * 0.6;
+            ctx.fillStyle = 'rgba(7, 18, 37, 0.72)';
+            roundRectPath(ctx, pad, pad, w, h, Math.max(14, Math.round(out.width * 0.014)));
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            lines.forEach((l, i) => ctx.fillText(l, pad * 2, pad + pad * 0.3 + textSize + lineH * i));
+          }
+          drawTargetBadge(ctx, out, m.targetMeters);
+          resolve(out.toDataURL('image/jpeg', 0.92));
+        };
+        img.onerror = () => resolve(item.url);
+        img.src = item.url;
+      });
+    }
+
+    function drawTargetBadge(ctx, out, targetMeters) {
+      const pad = Math.max(18, Math.round(out.width * 0.018));
+      const textSize = Math.max(24, Math.round(out.width * 0.024));
       // Cible à atteindre : pastille en haut à droite de la photo, si une cible est définie.
       if (targetMeters !== null && targetMeters !== undefined) {
         const targetText = `🎯 ${formatTarget(targetMeters)}`;
@@ -2124,14 +2207,58 @@
       downloadLink.download = `photo-finish-sifflet-${String(index + 1).padStart(3, '0')}.jpg`;
       downloadLink.classList.remove('hidden');
 
-      const who = participantsLabel(item.meta);
-      photoParticipants.textContent = who
-        ? `${item.meta.mode === 'individuel' ? 'Coureur' : 'Passage'} : ${who} — décompte ${item.meta.duration}s`
-        : `Décompte ${item.meta.duration}s`;
+      loadNamesIntoForm(item);
+      refreshPhotoHeader();
+      btnPrevPhoto.disabled = index >= galleryItems.length - 1;
+      btnNextPhoto.disabled = index <= 0;
 
       refreshPhotoTargetBadge();
       renderEcartPanel();
       photoOverlay.classList.remove('hidden');
+    }
+
+    function refreshPhotoHeader() {
+      const item = galleryItems[currentAttemptIndex];
+      if (!item) return;
+      const who = participantsLabel(item.meta);
+      const parts = [item.meta.label, `${item.meta.mode === 'individuel' ? 'Individuel' : 'Relais'}`, `temps de course ${item.meta.duration}s`].filter(Boolean);
+      photoParticipants.textContent = `${parts.join(' · ')}${who ? ' — ' + who : ' — coureur(s) à nommer'}`;
+    }
+
+    // Place les noms déjà saisis pour cette photo dans les listes (ou en saisie manuelle).
+    function setNameControl(select, manualInput, name) {
+      const n = (name || '').trim();
+      if (!n) { select.value = ''; manualInput.value = ''; manualInput.classList.add('hidden'); return; }
+      if (roster.some((s) => s.display === n)) { select.value = n; manualInput.value = ''; manualInput.classList.add('hidden'); return; }
+      select.value = MANUAL_OPTION; manualInput.value = n; manualInput.classList.remove('hidden');
+    }
+
+    function loadNamesIntoForm(item) {
+      const isIndividuel = item.meta.mode === 'individuel';
+      relayeurRow.classList.toggle('hidden', isIndividuel);
+      starterLabel.textContent = isIndividuel ? 'Coureur' : 'Démarreur';
+      setNameControl(starterSelect, starterManual, item.meta.starter);
+      setNameControl(relayeurSelect, relayeurManual, item.meta.relayeur);
+      targetHint.classList.add('hidden');
+    }
+
+    function saveNamesFromForm() {
+      const item = galleryItems[currentAttemptIndex];
+      if (!item) return;
+      item.meta.starter = getSelectedName(starterSelect, starterManual);
+      item.meta.relayeur = item.meta.mode === 'individuel' ? '' : getSelectedName(relayeurSelect, relayeurManual);
+      // Cible individuelle : reprise de la fiche de l'élève dès qu'on choisit le coureur.
+      if (item.meta.mode === 'individuel' && targetEnabled) {
+        const student = roster.find((s) => s.display === item.meta.starter);
+        if (student) item.meta.targetMeters = (student.cible === null || student.cible === undefined) ? null : student.cible;
+        else if (!item.meta.starter) item.meta.targetMeters = null;
+      }
+      saveGallery();
+      refreshPhotoHeader();
+      refreshPhotoTargetBadge();
+      renderEcartPanel();
+      renderGallery({ keepSelection: true });
+      refreshStatsLiveView();
     }
 
     function refreshPhotoTargetBadge() {
@@ -2176,10 +2303,12 @@
         btn.innerHTML = `
           <img src="${item.url}" alt="Photo finish ${index + 1}" />
           <div class="meta">
-            <div><strong>${item.meta.duration}s</strong> — <span class="ecart-tag ${kind}">${ecartLabel(ecart)}</span></div>
-            ${isIndividuel
-              ? `<div>Coureur : ${escapeHtml(item.meta.starter) || '—'}</div>`
-              : `<div>Démarreur : ${escapeHtml(item.meta.starter) || '—'}</div><div>Relayeur : ${escapeHtml(item.meta.relayeur) || '—'}</div>`}
+            <div><strong>${escapeHtml(item.meta.label || '')}</strong> · ${item.meta.duration}s — <span class="ecart-tag ${kind}">${ecartLabel(ecart)}</span></div>
+            ${!item.meta.starter
+              ? `<div class="todo">✏️ Coureur(s) à nommer</div>`
+              : (isIndividuel
+                ? `<div>Coureur : ${escapeHtml(item.meta.starter)}</div>`
+                : `<div>Démarreur : ${escapeHtml(item.meta.starter)}</div><div>Relayeur : ${escapeHtml(item.meta.relayeur) || '—'}</div>`)}
           </div>
         `;
         btn.addEventListener('click', () => openPhotoAnalysis(index));
@@ -2272,26 +2401,18 @@
         sourceCanvas.height = h;
         sourceCanvas.getContext('2d').drawImage(video, 0, 0, w, h);
 
-        const fallback = currentRaceLabel || 'Non renseigné';
-        const starter = getSelectedName(starterSelect, starterManual) || fallback;
-        const relayeur = raceMode === 'individuel' ? '' : (getSelectedName(relayeurSelect, relayeurManual) || fallback);
+        // Pendant la séance on ne saisit rien : la photo porte le n° de départ et le temps de
+        // course ; les noms (et donc la cible) sont ajoutés ensuite depuis la galerie.
+        const label = currentRaceLabel || `Départ n°${galleryItems.length + 1}`;
         const durationSeconds = currentRaceSeconds || clampSeconds(secondsInput.value);
-
-        // On fige la cible (en mètres) de l'élève au moment de la capture, pour que la popup
-        // d'analyse et la photo elle-même affichent toujours la bonne cible, même si la
-        // sélection change ensuite.
-        let targetMeters = null;
-        if (raceMode === 'individuel' && targetEnabled && starterSelect.value && starterSelect.value !== MANUAL_OPTION) {
-          const student = roster.find((s) => s.display === starterSelect.value);
-          if (student && student.cible !== null && student.cible !== undefined) targetMeters = student.cible;
-        }
-
-        const stampedCanvas = stampPhoto(sourceCanvas, durationSeconds, starter, relayeur, raceMode, targetMeters);
+        const stampedCanvas = stampPhoto(sourceCanvas, durationSeconds, label);
         const url = stampedCanvas.toDataURL('image/jpeg', 0.92);
 
         photoIndex += 1;
-        addToGallery(url, { mode: raceMode, duration: durationSeconds, starter, relayeur, ecart: null, targetMeters, createdAt: new Date().toISOString() });
-        openPhotoAnalysis(0);
+        addToGallery(url, { mode: raceMode, label, duration: durationSeconds, starter: '', relayeur: '', ecart: null, targetMeters: null, createdAt: new Date().toISOString() });
+        // Départs au sifflet : on ouvre la fiche pour noter tout de suite si on a le temps.
+        // Bande son (un départ toutes les 30 s) : la photo file dans la galerie, sans popup.
+        if (departMode === 'manuel') openPhotoAnalysis(0);
       } catch (err) {
         console.error(err);
         setStatus('Erreur pendant la capture');
@@ -2369,8 +2490,7 @@
       timerBox.classList.add('running');
       btnStart.disabled = true;
       btnStop.disabled = false;
-      const who = hasParticipants() ? '' : ' (coureur non choisi)';
-      setStatus(`${label ? label + ' — ' : ''}course en cours…${who}`);
+      setStatus(`${label ? label + ' — ' : ''}course en cours…`);
       requestWakeLock();
       countdownTimer = setInterval(onRaceTick, 50);
     }
@@ -2384,7 +2504,7 @@
         strongBeepPattern();
         setStatus('Bip ! Capture photo...');
         await capturePhoto();
-        if (departMode === 'bande' && currentRaceLabel) setStatus(`📸 ${currentRaceLabel} : photo prise — note l'écart`);
+        if (currentRaceLabel) setStatus(`📸 ${currentRaceLabel} : photo enregistrée dans la galerie`);
         currentRaceLabel = '';
         currentRaceSeconds = 0;
         remaining = clampSeconds(secondsInput.value);
@@ -2395,11 +2515,11 @@
 
     // Bouton "Top départ" : départ immédiat (le prof siffle et appuie, ou un élève appuie).
     function startCountdown() {
-      if (!validateParticipants()) {
-        setStatus('Nom du coureur manquant — décompte non démarré');
-        return;
-      }
-      startRace('Départ manuel');
+      startRace(nextManualLabel());
+    }
+
+    function nextManualLabel() {
+      return `Départ n°${galleryItems.length + 1}`;
     }
 
     // ---- Verrou d'écran : évite la mise en veille pendant une séance ----
@@ -2548,7 +2668,7 @@
         whistleFrames = 0;
         ignoreWhistleUntil = now + 1500;
         const late = WHISTLE_MIN_MS; // le sifflet a commencé ≈ 120 ms avant la détection
-        startRace('Départ au sifflet', late);
+        startRace(nextManualLabel(), late);
         if (navigator.vibrate) navigator.vibrate(60);
       }
     }
@@ -2797,8 +2917,26 @@
     });
     btnDeleteClass.addEventListener('click', deleteActiveClass);
     btnTargetInfo.addEventListener('click', () => targetExplainNote.classList.toggle('hidden'));
-    starterSelect.addEventListener('change', () => { syncManualVisibility(starterSelect, starterManual); updateTargetHint(); });
-    relayeurSelect.addEventListener('change', () => syncManualVisibility(relayeurSelect, relayeurManual));
+    starterSelect.addEventListener('change', () => { syncManualVisibility(starterSelect, starterManual); saveNamesFromForm(); });
+    relayeurSelect.addEventListener('change', () => { syncManualVisibility(relayeurSelect, relayeurManual); saveNamesFromForm(); });
+    starterManual.addEventListener('input', saveNamesFromForm);
+    relayeurManual.addEventListener('input', saveNamesFromForm);
+    btnPrevPhoto.addEventListener('click', () => openPhotoAnalysis(currentAttemptIndex + 1));
+    btnNextPhoto.addEventListener('click', () => openPhotoAnalysis(currentAttemptIndex - 1));
+    downloadLink.addEventListener('click', async (e) => {
+      const item = galleryItems[currentAttemptIndex];
+      if (!item || downloadLink.dataset.composed === '1') { downloadLink.dataset.composed = ''; return; }
+      e.preventDefault();
+      downloadLink.href = await composeDownload(item);
+      downloadLink.dataset.composed = '1';
+      downloadLink.click();
+    });
+    btnRotateDismiss.addEventListener('click', () => document.body.classList.add('portrait-ok'));
+    // Verrouillage en paysage quand c'est possible (appli installée / plein écran sur Android).
+    function tryLockLandscape() {
+      try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); } catch (err) {}
+    }
+    document.addEventListener('click', tryLockLandscape, { once: true });
     window.addEventListener('beforeunload', stopCamera);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
@@ -2809,6 +2947,15 @@
     });
 
     loadSeconds();
+    // Caméra : si l'autorisation a déjà été donnée, on la rallume dès l'ouverture de l'appli.
+    (async () => {
+      try {
+        if (navigator.permissions && navigator.permissions.query) {
+          const st = await navigator.permissions.query({ name: 'camera' });
+          if (st.state === 'granted' && !isCameraLive()) startCamera({ silent: true });
+        }
+      } catch (err) {}
+    })();
     loadWhistleSensitivity();
     loadDepartMode();
     buildEcartButtons();
